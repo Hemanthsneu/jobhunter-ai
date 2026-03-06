@@ -1,11 +1,33 @@
 /* ========================================
-   JobHunter AI — Popup Main Logic
+   JobHunter AI — Popup Main Logic v2
    ======================================== */
 
 (async function () {
     // ====== Init ======
     await StorageManager.init();
     const settings = await StorageManager.getSettings();
+
+    // ====== SVG Icon Helpers ======
+    const Icons = {
+        mapPin: '<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+        clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+        dollar: '<svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+        bookmark: '<svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+        target: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+        externalLink: '<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>',
+        check: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+        search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+        barChart: '<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+        clipboard: '<svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>',
+        copy: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+        loader: '<svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>',
+        fileText: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+        trash: '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'
+    };
+
+    function icon(name, size = 'sm') {
+        return `<span class="icon icon-${size}">${Icons[name] || ''}</span>`;
+    }
 
     // ====== Tab Navigation ======
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -18,6 +40,33 @@
             btn.classList.add('active');
             document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
         });
+    });
+
+    // ====== Onboarding ======
+    function checkOnboarding() {
+        const hasKey = !!settings.geminiKey;
+        const hasRole = !!settings.profileRole;
+        const hasResume = !!currentResumeText;
+
+        const card = document.getElementById('onboarding-card');
+        if (!hasKey || !hasRole) {
+            card.style.display = 'block';
+            const stepApi = document.getElementById('step-api');
+            const stepProfile = document.getElementById('step-profile');
+            const stepResume = document.getElementById('step-resume');
+            if (hasKey) stepApi.classList.add('complete');
+            if (hasRole) stepProfile.classList.add('complete');
+            if (hasResume) stepResume.classList.add('complete');
+        } else {
+            card.style.display = 'none';
+        }
+    }
+
+    document.getElementById('btn-go-settings')?.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        document.querySelector('[data-tab="settings"]').classList.add('active');
+        document.getElementById('tab-settings').classList.add('active');
     });
 
     // ====== Load Settings ======
@@ -59,12 +108,12 @@
         await StorageManager.saveSettings(newSettings);
         Object.assign(settings, newSettings);
 
-        // Notify background to update alarm
         chrome.runtime?.sendMessage({ type: 'SETTINGS_UPDATED', settings: newSettings }, () => { if (chrome.runtime.lastError) { /* suppress */ } });
 
         const feedback = document.getElementById('save-feedback');
         feedback.style.display = 'block';
         setTimeout(() => feedback.style.display = 'none', 2000);
+        checkOnboarding();
     });
 
     // Threshold slider
@@ -114,16 +163,13 @@
     async function handleResumeFile(file) {
         const uploadZoneEl = document.getElementById('upload-zone');
 
-        // Show loading state
         if (uploadZoneEl) {
-            uploadZoneEl.innerHTML = '<div class="upload-icon">⏳</div><p>Extracting text from resume...</p>';
+            uploadZoneEl.innerHTML = '<div class="upload-icon"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div><p>Extracting text from resume...</p>';
         }
 
         let text = '';
-
         try {
             if (file.name.toLowerCase().endsWith('.pdf')) {
-                // For PDFs: use Gemini API which natively parses PDFs
                 if (settings.geminiKey) {
                     const base64 = await readFileAsBase64(file);
                     const response = await fetch(
@@ -132,12 +178,7 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                contents: [{
-                                    parts: [
-                                        { text: 'Extract ALL text content from this PDF resume. Return ONLY the raw text exactly as it appears in the document, preserving the structure. Do not add any commentary, headers, or formatting instructions.' },
-                                        { inlineData: { mimeType: 'application/pdf', data: base64 } }
-                                    ]
-                                }],
+                                contents: [{ parts: [{ text: 'Extract ALL text content from this PDF resume. Return ONLY the raw text exactly as it appears in the document, preserving the structure. Do not add any commentary.' }, { inlineData: { mimeType: 'application/pdf', data: base64 } }] }],
                                 generationConfig: { temperature: 0, maxOutputTokens: 8192 }
                             })
                         }
@@ -145,15 +186,13 @@
                     const data = await response.json();
                     text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
                 } else {
-                    // No Gemini key — can't parse PDF
                     if (uploadZoneEl) {
-                        uploadZoneEl.innerHTML = '<div class="upload-icon">⚠️</div><p style="color:#ffa502;">Add your Gemini API key in Settings first to parse PDF resumes.</p><p class="upload-hint">Or upload as a .txt file instead</p>';
+                        uploadZoneEl.innerHTML = '<div class="upload-icon" style="color:var(--warning)"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><p style="color:var(--warning)">Add your Gemini API key in Settings first to parse PDF resumes.</p><p class="upload-hint">Or upload as a .txt file instead</p>';
                         uploadZoneEl.style.display = 'block';
                     }
                     return;
                 }
             } else {
-                // Plain text files
                 text = await readFileAsText(file);
             }
         } catch (e) {
@@ -163,22 +202,16 @@
 
         if (!text || text.trim().length < 20) {
             if (uploadZoneEl) {
-                uploadZoneEl.innerHTML = '<div class="upload-icon">❌</div><p style="color:#ff4757;">Could not extract text from this file.</p><p class="upload-hint">Try copying your resume text into a .txt file and uploading that</p>';
+                uploadZoneEl.innerHTML = '<div class="upload-icon" style="color:var(--danger)"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><p style="color:var(--danger)">Could not extract text from this file.</p><p class="upload-hint">Try copying your resume text into a .txt file</p>';
                 uploadZoneEl.style.display = 'block';
             }
             return;
         }
 
         currentResumeText = text;
-
-        await StorageManager.saveResume({
-            id: 'primary',
-            filename: file.name,
-            text: text,
-            uploadedAt: new Date().toISOString()
-        });
-
+        await StorageManager.saveResume({ id: 'primary', filename: file.name, text: text, uploadedAt: new Date().toISOString() });
         showResumePreview(file.name, text);
+        checkOnboarding();
     }
 
     function readFileAsText(file) {
@@ -192,10 +225,7 @@
     function readFileAsBase64(file) {
         return new Promise((resolve) => {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64 = e.target.result.split(',')[1];
-                resolve(base64);
-            };
+            reader.onload = (e) => { resolve(e.target.result.split(',')[1]); };
             reader.readAsDataURL(file);
         });
     }
@@ -230,13 +260,11 @@
 
         const btn = document.getElementById('btn-analyze-resume');
         btn.disabled = true;
-        btn.textContent = '⏳ Analyzing...';
+        btn.innerHTML = `${icon('loader', 'sm')} Analyzing...`;
 
-        // Quick local ATS score first
         const quickResult = ATSScorer.quickScore(currentResumeText, settings.profileSkills || 'software engineer');
         displayATSScore(quickResult);
 
-        // Deep Gemini analysis if key available
         if (settings.geminiKey) {
             try {
                 const deepResult = await GeminiAI.calculateATSScore(
@@ -245,11 +273,7 @@
                     `Role: ${settings.profileRole || 'Senior Software Engineer'}\nRequired Skills: ${settings.profileSkills || 'Not specified'}`
                 );
                 if (!deepResult.error) {
-                    displayATSScore({
-                        overallScore: deepResult.overallScore,
-                        breakdown: deepResult.breakdown,
-                        improvements: deepResult.topImprovements
-                    });
+                    displayATSScore({ overallScore: deepResult.overallScore, breakdown: deepResult.breakdown, improvements: deepResult.topImprovements });
                 }
             } catch (e) {
                 console.error('Gemini ATS analysis failed:', e);
@@ -257,7 +281,7 @@
         }
 
         btn.disabled = false;
-        btn.textContent = '📊 Analyze My Resume';
+        btn.innerHTML = `${icon('barChart', 'sm')} Analyze My Resume`;
     });
 
     function displayATSScore(result) {
@@ -266,10 +290,9 @@
 
         const score = result.overallScore || 0;
         const ring = document.getElementById('ats-score-ring');
-        const circumference = 2 * Math.PI * 54; // r=54
+        const circumference = 2 * Math.PI * 54;
         ring.style.strokeDashoffset = circumference - (score / 100) * circumference;
 
-        // Color based on score
         if (score >= 90) ring.style.stroke = 'var(--success)';
         else if (score >= 75) ring.style.stroke = 'var(--warning)';
         else ring.style.stroke = 'var(--danger)';
@@ -282,10 +305,7 @@
                 const s = typeof val === 'object' ? val.score : val;
                 const cls = s >= 80 ? 'good' : s >= 60 ? 'okay' : 'bad';
                 const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
-                return `<div class="ats-detail-item">
-          <span class="ats-detail-label">${label}</span>
-          <span class="ats-detail-value ${cls}">${s}%</span>
-        </div>`;
+                return `<div class="ats-detail-item"><span class="ats-detail-label">${label}</span><span class="ats-detail-value ${cls}">${s}%</span></div>`;
             }).join('');
             details.innerHTML = items;
         }
@@ -301,46 +321,34 @@
 
         const btn = document.getElementById('btn-search-jobs');
         btn.disabled = true;
-        btn.textContent = '⏳ Searching...';
+        btn.innerHTML = `${icon('loader', 'sm')} Searching...`;
 
         try {
             if (settings.serpApiKey) {
                 const jobs = await JobSearch.searchGoogleJobs(settings.serpApiKey, query, location, { hoursAgo });
 
-                // AI score each job if Gemini key available
                 if (settings.geminiKey && currentResumeText && jobs.length > 0) {
-                    for (const job of jobs.slice(0, 5)) { // Score top 5 to save API calls
+                    for (const job of jobs.slice(0, 5)) {
                         try {
                             const match = await GeminiAI.analyzeJobMatch(settings.geminiKey, currentResumeText, job.description, {
-                                role: settings.profileRole,
-                                yoe: settings.profileYOE,
-                                skills: settings.profileSkills
+                                role: settings.profileRole, yoe: settings.profileYOE, skills: settings.profileSkills
                             });
                             job.matchScore = match.matchScore || 0;
                             job.matchDetails = match;
-                        } catch (e) {
-                            console.warn('Match scoring failed for job:', e);
-                        }
+                        } catch (e) { console.warn('Match scoring failed:', e); }
                     }
                 }
 
-                // Save & display
-                for (const job of jobs) {
-                    await StorageManager.saveJob(job);
-                }
-
+                for (const job of jobs) { await StorageManager.saveJob(job); }
                 displayJobs(jobs);
             } else {
-                // No SerpApi key — open Google Jobs directly
                 const url = `https://www.google.com/search?q=${encodeURIComponent(query + ' jobs')}&ibp=htl;jobs`;
                 chrome.tabs?.create({ url });
             }
-        } catch (e) {
-            console.error('Search failed:', e);
-        }
+        } catch (e) { console.error('Search failed:', e); }
 
         btn.disabled = false;
-        btn.textContent = '🔍 Search Jobs Now';
+        btn.innerHTML = `${icon('search', 'sm')} Search Jobs`;
     });
 
     // ====== Smart Hunt ======
@@ -359,39 +367,26 @@
                 progressText.textContent = p.text;
             });
 
-            // Display jobs from SerpApi
             if (result.jobs.length > 0) {
-                for (const job of result.jobs) {
-                    await StorageManager.saveJob(job);
-                }
-
-                // Switch to jobs tab and show results
+                for (const job of result.jobs) { await StorageManager.saveJob(job); }
                 tabBtns[0].click();
 
-                // Score jobs with AI
                 if (settings.geminiKey && currentResumeText) {
                     for (const job of result.jobs.slice(0, 5)) {
                         try {
                             const match = await GeminiAI.analyzeJobMatch(settings.geminiKey, currentResumeText, job.description, {
-                                role: settings.profileRole,
-                                yoe: settings.profileYOE,
-                                skills: settings.profileSkills
+                                role: settings.profileRole, yoe: settings.profileYOE, skills: settings.profileSkills
                             });
                             job.matchScore = match.matchScore || 0;
                             job.matchDetails = match;
                             await StorageManager.saveJob(job);
-                        } catch (e) {
-                            console.warn('Scoring failed:', e);
-                        }
+                        } catch (e) { console.warn('Scoring failed:', e); }
                     }
                 }
-
                 displayJobs(result.jobs);
             }
 
-            // Generate quick links
             generateQuickLinks(result.atsSearches);
-
             progressFill.style.width = '100%';
             progressText.textContent = `Found ${result.jobs.length} jobs + ${result.atsSearches.length} search links ready!`;
         } catch (e) {
@@ -406,13 +401,12 @@
         const container = document.getElementById('quick-links');
         container.innerHTML = searches.map(s => `
       <a class="quick-link" href="${s.directUrl}" target="_blank" data-source="${s.source}">
-        <span class="quick-link-icon">${s.icon}</span>
+        <span class="quick-link-icon">${icon('externalLink', 'sm')}</span>
         <span class="quick-link-text">${s.name}</span>
         <span class="quick-link-badge">Open</span>
       </a>
     `).join('');
 
-        // Open in new tab
         container.querySelectorAll('.quick-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -421,12 +415,8 @@
         });
     }
 
-    // Auto-generate quick links based on saved profile
     if (settings.profileRole) {
-        const searches = JobSearch.generateATSBoardSearches(settings.profileRole, {
-            hoursAgo: 24,
-            location: settings.profileLocations || ''
-        });
+        const searches = JobSearch.generateATSBoardSearches(settings.profileRole, { hoursAgo: 24, location: settings.profileLocations || '' });
         generateQuickLinks(searches);
     }
 
@@ -437,7 +427,7 @@
         if (!jobs || jobs.length === 0) {
             list.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">🔍</div>
+          ${icon('search', 'lg')}
           <p>No jobs found yet. Try adjusting your search or click <strong>Smart Hunt</strong>!</p>
         </div>`;
             return;
@@ -456,35 +446,29 @@
           </div>
           <div class="job-company">${escapeHTML(job.company)}</div>
           <div class="job-meta">
-            <span>📍 ${escapeHTML(job.location || 'Not specified')}</span>
-            <span>⏰ ${escapeHTML(timeAgo)}</span>
-            ${job.salary ? `<span>💰 ${escapeHTML(job.salary)}</span>` : ''}
+            <span>${icon('mapPin', 'xs')} ${escapeHTML(job.location || 'Not specified')}</span>
+            <span>${icon('clock', 'xs')} ${escapeHTML(timeAgo)}</span>
+            ${job.salary ? `<span>${icon('dollar', 'xs')} ${escapeHTML(job.salary)}</span>` : ''}
           </div>
           ${job.via ? `<div class="job-tags"><span class="job-tag">${escapeHTML(job.via)}</span></div>` : ''}
           <div class="job-actions">
-            <button class="btn btn-sm btn-outline btn-save-job" data-job-id="${job.id}">💾 Save</button>
-            <button class="btn btn-sm btn-primary btn-analyze-job" data-job-id="${job.id}">🎯 Analyze</button>
-            ${job.applyLink ? `<a class="btn btn-sm btn-accent" href="${job.applyLink}" target="_blank">Apply →</a>` : ''}
+            <button class="btn btn-sm btn-ghost btn-save-job" data-job-id="${job.id}">${icon('bookmark', 'xs')} Save</button>
+            <button class="btn btn-sm btn-primary btn-analyze-job" data-job-id="${job.id}">${icon('target', 'xs')} Analyze</button>
+            ${job.applyLink ? `<a class="btn btn-sm btn-accent" href="${job.applyLink}" target="_blank">${icon('externalLink', 'xs')} Apply</a>` : ''}
           </div>
         </div>`;
         }).join('');
 
-        // Update stats
         document.querySelector('#stat-jobs .stat-value').textContent = jobs.length;
 
-        // Event listeners
         list.querySelectorAll('.btn-save-job').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const jobId = btn.dataset.jobId;
                 const job = jobs.find(j => j.id === jobId);
                 if (job) {
-                    await StorageManager.saveApplication({
-                        ...job,
-                        status: 'saved',
-                        savedAt: new Date().toISOString()
-                    });
-                    btn.textContent = '✅ Saved';
+                    await StorageManager.saveApplication({ ...job, status: 'saved', savedAt: new Date().toISOString() });
+                    btn.innerHTML = `${icon('check', 'xs')} Saved`;
                     btn.disabled = true;
                     refreshTracker();
                 }
@@ -496,37 +480,23 @@
                 e.stopPropagation();
                 const jobId = btn.dataset.jobId;
                 const job = jobs.find(j => j.id === jobId);
-                if (job) {
-                    await analyzeAndTailorJob(job);
-                }
+                if (job) { await analyzeAndTailorJob(job); }
             });
         });
     }
 
     // ====== Analyze & Tailor for specific job ======
     async function analyzeAndTailorJob(job) {
-        if (!settings.geminiKey) {
-            alert('Please add your Gemini API key in Settings first.');
-            return;
-        }
-        if (!currentResumeText) {
-            alert('Please upload your resume in the Resume tab first.');
-            return;
-        }
+        if (!settings.geminiKey) { alert('Please add your Gemini API key in Settings first.'); return; }
+        if (!currentResumeText) { alert('Please upload your resume in the Resume tab first.'); return; }
 
-        // Open side panel or show in-popup analysis
         try {
-            // Try to open side panel
             if (chrome.sidePanel) {
                 await chrome.sidePanel.open({ windowId: (await chrome.windows.getCurrent()).id });
                 chrome.runtime.sendMessage({
-                    type: 'ANALYZE_JOB',
-                    job: job,
-                    resume: currentResumeText,
-                    settings: settings
+                    type: 'ANALYZE_JOB', job: job, resume: currentResumeText, settings: settings
                 }, () => { if (chrome.runtime.lastError) { /* suppress */ } });
             } else {
-                // Fallback: show analysis in popup
                 await showInlineAnalysis(job);
             }
         } catch (e) {
@@ -536,55 +506,40 @@
 
     async function showInlineAnalysis(job) {
         const template = document.querySelector('.template-btn.active')?.dataset.template || 'jakes';
-
-        // Show loading
         const card = document.querySelector(`.job-card[data-job-id="${job.id}"]`);
         if (card) {
             const actionsDiv = card.querySelector('.job-actions');
-            actionsDiv.innerHTML = '<span class="loading">⏳ AI analyzing & tailoring resume...</span>';
+            actionsDiv.innerHTML = `<span class="loading">${icon('loader', 'sm')} AI analyzing & tailoring resume...</span>`;
         }
 
         try {
-            // Get ATS score
             const atsResult = await GeminiAI.calculateATSScore(settings.geminiKey, currentResumeText, job.description);
+            const tailoredResume = await GeminiAI.tailorResume(settings.geminiKey, currentResumeText, job.description, template, {
+                name: settings.profileName || '', role: settings.profileRole || '', yoe: settings.profileYOE || ''
+            });
 
-            // Tailor resume
-            const tailoredResume = await GeminiAI.tailorResume(
-                settings.geminiKey,
-                currentResumeText,
-                job.description,
-                template,
-                {
-                    name: settings.profileName || '',
-                    role: settings.profileRole || '',
-                    yoe: settings.profileYOE || ''
-                }
-            );
-
-            // Show results
             if (card) {
                 const atsScore = atsResult.overallScore || 0;
                 const scoreColor = atsScore >= 90 ? 'good' : atsScore >= 75 ? 'okay' : 'bad';
-
                 card.innerHTML += `
           <div class="tailored-output">
             <div class="tailored-header">
-              <h3>🎯 ATS Score: <span class="ats-detail-value ${scoreColor}">${atsScore}%</span></h3>
-              <button class="btn btn-sm btn-primary btn-copy-resume">📋 Copy</button>
+              <h3>ATS Score: <span class="ats-detail-value ${scoreColor}">${atsScore}%</span></h3>
+              <button class="btn btn-sm btn-ghost btn-copy-resume">${icon('copy', 'xs')} Copy</button>
             </div>
             <div class="tailored-body">${escapeHTML(tailoredResume)}</div>
           </div>`;
 
                 card.querySelector('.btn-copy-resume')?.addEventListener('click', () => {
                     navigator.clipboard.writeText(tailoredResume);
-                    card.querySelector('.btn-copy-resume').textContent = '✅ Copied!';
+                    card.querySelector('.btn-copy-resume').innerHTML = `${icon('check', 'xs')} Copied!`;
                 });
             }
         } catch (e) {
             console.error('Analysis failed:', e);
             if (card) {
                 const actionsDiv = card.querySelector('.job-actions') || card;
-                actionsDiv.innerHTML = `<span style="color:var(--danger)">❌ Error: ${e.message}</span>`;
+                actionsDiv.innerHTML = `<span style="color:var(--danger);font-size:12px;">Analysis failed: ${e.message}</span>`;
             }
         }
     }
@@ -602,14 +557,13 @@
         const apps = await StorageManager.getApplications(statusFilter);
         const list = document.getElementById('tracker-list');
 
-        // Update stats
         const allApps = await StorageManager.getApplications('all');
         document.querySelector('#stat-applied .stat-value').textContent = allApps.filter(a => a.status === 'applied').length;
 
         if (!apps.length) {
             list.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📋</div>
+          ${icon('fileText', 'lg')}
           <p>No ${statusFilter === 'all' ? '' : statusFilter + ' '}applications yet.</p>
         </div>`;
             return;
@@ -624,7 +578,7 @@
         <div class="tracker-item-company">${escapeHTML(app.company)}</div>
         <div class="tracker-item-date">
           ${app.savedAt ? 'Saved: ' + new Date(app.savedAt).toLocaleDateString() : ''}
-          ${app.appliedAt ? ' | Applied: ' + new Date(app.appliedAt).toLocaleDateString() : ''}
+          ${app.appliedAt ? ' · Applied: ' + new Date(app.appliedAt).toLocaleDateString() : ''}
         </div>
         <div class="tracker-item-actions">
           <select class="status-select" data-app-id="${app.id}">
@@ -634,12 +588,11 @@
             <option value="offer" ${app.status === 'offer' ? 'selected' : ''}>Offer</option>
             <option value="rejected" ${app.status === 'rejected' ? 'selected' : ''}>Rejected</option>
           </select>
-          <button class="btn btn-sm btn-danger btn-delete-app" data-app-id="${app.id}">🗑</button>
+          <button class="btn btn-sm btn-danger btn-delete-app" data-app-id="${app.id}">${icon('trash', 'xs')}</button>
         </div>
       </div>
     `).join('');
 
-        // Status change handlers
         list.querySelectorAll('.status-select').forEach(select => {
             select.addEventListener('change', async (e) => {
                 const appId = select.dataset.appId;
@@ -653,7 +606,6 @@
             });
         });
 
-        // Delete handlers
         list.querySelectorAll('.btn-delete-app').forEach(btn => {
             btn.addEventListener('click', async () => {
                 await StorageManager.delete('applications', btn.dataset.appId);
@@ -693,5 +645,8 @@
         div.textContent = str;
         return div.innerHTML;
     }
+
+    // Init onboarding check
+    checkOnboarding();
 
 })();

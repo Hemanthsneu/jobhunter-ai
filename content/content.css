@@ -1,6 +1,6 @@
 /* ========================================
-   JobHunter AI — Content Script Styles
-   Styles for injected elements on job boards
+   JobHunter AI — Content Script Styles v2
+   Injected elements on job boards
    ======================================== */
 
 /* ====== Buttons ====== */
@@ -9,22 +9,23 @@
     align-items: center;
     gap: 4px;
     padding: 5px 12px;
-    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    background: #6366f1;
     color: white;
     border: none;
     border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
     z-index: 9999;
 }
 
 .jh-btn:hover {
+    background: #4f46e5;
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(108, 92, 231, 0.5);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
 }
 
 .jh-btn:active {
@@ -46,7 +47,7 @@
     padding: 10px 0;
     align-items: center;
     flex-wrap: wrap;
-    border-top: 1px solid rgba(108, 92, 231, 0.2);
+    border-top: 1px solid rgba(99, 102, 241, 0.15);
     margin-top: 8px;
 }
 
@@ -56,29 +57,29 @@
     align-items: center;
     gap: 4px;
     padding: 3px 10px;
-    border-radius: 20px;
+    border-radius: 9999px;
     font-size: 12px;
     font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     z-index: 9999;
 }
 
 .jh-score-high {
-    background: rgba(0, 210, 160, 0.15);
-    color: #00b894;
-    border: 1px solid rgba(0, 210, 160, 0.3);
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.25);
 }
 
 .jh-score-med {
-    background: rgba(255, 165, 2, 0.15);
-    color: #e17055;
-    border: 1px solid rgba(255, 165, 2, 0.3);
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .jh-score-low {
-    background: rgba(255, 71, 87, 0.15);
-    color: #d63031;
-    border: 1px solid rgba(255, 71, 87, 0.3);
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 .jh-score-icon {
@@ -94,18 +95,18 @@
     align-items: center;
     gap: 8px;
     padding: 12px 20px;
-    background: #1a1a2e;
-    color: #e8e8ed;
+    background: #111119;
+    color: #e6e6ec;
     border-radius: 10px;
     font-size: 13px;
     font-weight: 500;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     z-index: 999999;
     transform: translateY(100px);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-left: 3px solid #6c5ce7;
+    border-left: 3px solid #6366f1;
 }
 
 .jh-toast-show {
@@ -114,11 +115,11 @@
 }
 
 .jh-toast-success {
-    border-left-color: #00d2a0;
+    border-left-color: #22c55e;
 }
 
 .jh-toast-error {
-    border-left-color: #ff4757;
+    border-left-color: #ef4444;
 }
 
 .jh-toast-icon {
@@ -127,12 +128,12 @@
 
 /* ====== LinkedIn Time Filter Banner ====== */
 .jh-time-banner {
-    background: linear-gradient(135deg, #1a1a2e, #16163a);
-    border: 1px solid rgba(108, 92, 231, 0.3);
+    background: #111119;
+    border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: 10px;
     padding: 10px 16px;
     margin: 8px 0;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     z-index: 9999;
     position: relative;
 }
@@ -147,21 +148,21 @@
 .jh-banner-icon {
     font-size: 13px;
     font-weight: 700;
-    color: #a29bfe;
+    color: #818cf8;
     white-space: nowrap;
 }
 
 .jh-banner-text {
     font-size: 12px;
-    color: #8e8ea0;
+    color: #9393a8;
 }
 
 .jh-banner-btn {
     padding: 4px 12px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 6px;
-    color: #e8e8ed;
+    color: #e6e6ec;
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
@@ -170,12 +171,12 @@
 }
 
 .jh-banner-btn:hover {
-    background: rgba(108, 92, 231, 0.2);
-    border-color: rgba(108, 92, 231, 0.5);
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.4);
 }
 
 .jh-banner-btn-active {
-    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    background: #6366f1;
     border-color: transparent;
 }
 
@@ -185,12 +186,12 @@
     right: 10px;
     background: none;
     border: none;
-    color: #555;
+    color: #5c5c72;
     cursor: pointer;
     font-size: 14px;
     padding: 2px;
 }
 
 .jh-banner-close:hover {
-    color: #ff4757;
+    color: #ef4444;
 }

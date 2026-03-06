@@ -151,19 +151,52 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         case 'ANALYZE_JOB':
             // Store job data for side panel to pick up when it opens
             chrome.storage.local.set({ pendingJobAnalysis: message.job });
-            // Try to forward to side panel (may not be open — use callback to suppress error)
-            chrome.runtime.sendMessage({
-                type: 'SIDEPANEL_ANALYZE',
-                job: message.job,
-                resume: message.resume,
-                settings: message.settings
-            }, () => {
-                // Check and suppress "receiving end does not exist" error
-                if (chrome.runtime.lastError) {
-                    // Side panel not open — data is already stored, it will pick it up
+
+            // Open side panel — use sender.tab.id if from content script
+            (async () => {
+                try {
+                    if (sender.tab?.id) {
+                        await chrome.sidePanel.open({ tabId: sender.tab.id });
+                    } else {
+                        const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+                        if (activeTab) {
+                            await chrome.sidePanel.open({ tabId: activeTab.id });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not open side panel:', e);
                 }
-            });
+
+                // Forward to side panel (it may have just opened)
+                setTimeout(() => {
+                    chrome.runtime.sendMessage({
+                        type: 'SIDEPANEL_ANALYZE',
+                        job: message.job,
+                        resume: message.resume,
+                        settings: message.settings
+                    }, () => {
+                        if (chrome.runtime.lastError) {
+                            // Side panel will pick it up from storage
+                        }
+                    });
+                }, 500);
+            })();
             break;
+
+        case 'SAVE_JOB':
+            // Save job from content scripts to IndexedDB
+            (async () => {
+                try {
+                    const db = await openDB();
+                    const tx = db.transaction('applications', 'readwrite');
+                    tx.objectStore('applications').put(message.job);
+                    sendResponse({ success: true });
+                } catch (e) {
+                    console.error('Failed to save job:', e);
+                    sendResponse({ success: false, error: e.message });
+                }
+            })();
+            return true; // Keep channel open for async
 
         case 'RUN_SEARCH':
             runScheduledSearch().then(() => sendResponse({ success: true }));

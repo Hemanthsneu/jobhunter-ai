@@ -12,26 +12,35 @@
   <div class="app">
     <!-- Header -->
     <header class="header">
-      <div class="header-left">
-        <div class="logo">
-          <span class="logo-icon">🎯</span>
-          <h1>JobHunter <span class="ai-badge">AI</span></h1>
+      <div class="logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
         </div>
+        <div class="logo-text">JobHunter <span>AI</span></div>
       </div>
-      <div class="header-right">
-        <div class="stats-mini">
-          <div class="stat-pill" id="stat-jobs" title="Jobs Found">
-            <span class="stat-icon">📋</span>
-            <span class="stat-value">0</span>
-          </div>
-          <div class="stat-pill" id="stat-applied" title="Applied">
-            <span class="stat-icon">✅</span>
-            <span class="stat-value">0</span>
-          </div>
-          <div class="stat-pill" id="stat-ats" title="Avg ATS Score">
-            <span class="stat-icon">📊</span>
-            <span class="stat-value">--</span>
-          </div>
+      <div class="stats-row">
+        <div class="stat-chip" id="stat-jobs" title="Jobs Found">
+          <span class="icon icon-xs"><svg viewBox="0 0 24 24">
+              <rect x="2" y="7" width="20" height="14" rx="2" />
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+            </svg></span>
+          <span class="stat-value">0</span>
+        </div>
+        <div class="stat-chip" id="stat-applied" title="Applied">
+          <span class="icon icon-xs"><svg viewBox="0 0 24 24">
+              <polyline points="20 6 9 17 4 12" />
+            </svg></span>
+          <span class="stat-value">0</span>
+        </div>
+        <div class="stat-chip" id="stat-ats" title="Avg ATS Score">
+          <span class="icon icon-xs"><svg viewBox="0 0 24 24">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg></span>
+          <span class="stat-value">--</span>
         </div>
       </div>
     </header>
@@ -39,33 +48,54 @@
     <!-- Tab Navigation -->
     <nav class="tab-nav">
       <button class="tab-btn active" data-tab="jobs">
-        <span class="tab-icon">🔍</span>
-        <span class="tab-label">Jobs</span>
+        <span class="icon"><svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg></span>
+        <span>Jobs</span>
       </button>
       <button class="tab-btn" data-tab="search">
-        <span class="tab-icon">🚀</span>
-        <span class="tab-label">Hunt</span>
+        <span class="icon"><svg viewBox="0 0 24 24">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg></span>
+        <span>Hunt</span>
       </button>
       <button class="tab-btn" data-tab="tracker">
-        <span class="tab-icon">📋</span>
-        <span class="tab-label">Tracker</span>
+        <span class="icon"><svg viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg></span>
+        <span>Tracker</span>
       </button>
       <button class="tab-btn" data-tab="resume">
-        <span class="tab-icon">📄</span>
-        <span class="tab-label">Resume</span>
+        <span class="icon"><svg viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg></span>
+        <span>Resume</span>
       </button>
       <button class="tab-btn" data-tab="settings">
-        <span class="tab-icon">⚙️</span>
-        <span class="tab-label">Settings</span>
+        <span class="icon"><svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg></span>
+        <span>Settings</span>
       </button>
     </nav>
 
     <!-- JOBS TAB -->
     <div class="tab-content active" id="tab-jobs">
       <div class="section-header">
-        <h2>Latest Job Matches</h2>
-        <button class="btn btn-sm btn-primary" id="btn-refresh-jobs">
-          <span>↻</span> Refresh
+        <h2>Latest Matches</h2>
+        <button class="btn btn-sm btn-ghost" id="btn-refresh-jobs">
+          <span class="icon icon-sm"><svg viewBox="0 0 24 24">
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg></span>
+          Refresh
         </button>
       </div>
       <div class="filters-bar">
@@ -84,9 +114,25 @@
           <option value="ashby">Ashby</option>
         </select>
       </div>
+
+      <!-- Onboarding Card (shown when no API keys configured) -->
+      <div class="onboarding-card" id="onboarding-card" style="display:none;">
+        <h3>Welcome to JobHunter AI</h3>
+        <p>Complete setup to start finding your perfect role.</p>
+        <div class="setup-steps">
+          <div class="setup-step" id="step-api"><span class="step-num">1</span> Add your Gemini API key</div>
+          <div class="setup-step" id="step-profile"><span class="step-num">2</span> Set your target role</div>
+          <div class="setup-step" id="step-resume"><span class="step-num">3</span> Upload your resume</div>
+        </div>
+        <button class="btn btn-primary btn-full" id="btn-go-settings">Get Started</button>
+      </div>
+
       <div class="job-list" id="job-list">
         <div class="empty-state">
-          <div class="empty-icon">🎯</div>
+          <span class="icon"><svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg></span>
           <p>Set up your profile & API keys in <strong>Settings</strong>, then click <strong>Hunt</strong> to find jobs!
           </p>
         </div>
@@ -96,11 +142,17 @@
     <!-- HUNT TAB -->
     <div class="tab-content" id="tab-search">
       <div class="section-header">
-        <h2>🚀 Job Hunt</h2>
+        <h2>Job Hunt</h2>
       </div>
 
-      <div class="hunt-card">
-        <h3>Quick Search</h3>
+      <div class="card">
+        <div class="card-title">
+          <span class="icon icon-md"><svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg></span>
+          Quick Search
+        </div>
         <div class="form-group">
           <label>Job Title / Keywords</label>
           <input type="text" id="search-query" placeholder="Senior Software Engineer" class="input">
@@ -121,32 +173,34 @@
           </div>
         </div>
         <button class="btn btn-primary btn-full" id="btn-search-jobs">
-          🔍 Search Jobs Now
+          <span class="icon icon-sm"><svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg></span>
+          Search Jobs
         </button>
       </div>
 
-      <div class="hunt-card">
-        <h3>🎯 Smart Hunt — ATS Board Crawler</h3>
+      <div class="card">
+        <div class="card-title">
+          <span class="icon icon-md"><svg viewBox="0 0 24 24">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg></span>
+          Smart Hunt — ATS Crawler
+        </div>
         <p class="card-desc">Auto-search Greenhouse, Ashby, Lever & more for the freshest postings</p>
         <div class="hunt-sources">
-          <label class="checkbox-label">
-            <input type="checkbox" checked data-source="greenhouse"> Greenhouse
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" checked data-source="ashby"> Ashby
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" checked data-source="lever"> Lever
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" checked data-source="linkedin"> LinkedIn
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" checked data-source="google"> Google Jobs
-          </label>
+          <label class="checkbox-label"><input type="checkbox" checked data-source="greenhouse"> Greenhouse</label>
+          <label class="checkbox-label"><input type="checkbox" checked data-source="ashby"> Ashby</label>
+          <label class="checkbox-label"><input type="checkbox" checked data-source="lever"> Lever</label>
+          <label class="checkbox-label"><input type="checkbox" checked data-source="linkedin"> LinkedIn</label>
+          <label class="checkbox-label"><input type="checkbox" checked data-source="google"> Google Jobs</label>
         </div>
         <button class="btn btn-accent btn-full" id="btn-smart-hunt">
-          🚀 Launch Smart Hunt
+          <span class="icon icon-sm"><svg viewBox="0 0 24 24">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg></span>
+          Launch Smart Hunt
         </button>
         <div class="hunt-progress" id="hunt-progress" style="display:none;">
           <div class="progress-bar">
@@ -156,8 +210,15 @@
         </div>
       </div>
 
-      <div class="hunt-card">
-        <h3>⚡ Quick Links — Latest Jobs</h3>
+      <div class="card">
+        <div class="card-title">
+          <span class="icon icon-md"><svg viewBox="0 0 24 24">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg></span>
+          Quick Links
+        </div>
         <p class="card-desc">Open pre-filtered searches in new tabs</p>
         <div class="quick-links" id="quick-links">
           <!-- Populated dynamically -->
@@ -181,7 +242,12 @@
       </div>
       <div class="tracker-list" id="tracker-list">
         <div class="empty-state">
-          <div class="empty-icon">📋</div>
+          <span class="icon"><svg viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg></span>
           <p>No tracked applications yet. Click <strong>"Save"</strong> or <strong>"Applied"</strong> on any job to
             start tracking.</p>
         </div>
@@ -196,7 +262,12 @@
 
       <div class="resume-upload-card" id="resume-upload-area">
         <div class="upload-zone" id="upload-zone">
-          <div class="upload-icon">📄</div>
+          <div class="upload-icon"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg></div>
           <p>Drag & drop your resume or <label for="resume-file" class="upload-link">browse</label></p>
           <p class="upload-hint">Supports .txt and .pdf files</p>
           <input type="file" id="resume-file" accept=".txt,.pdf,.doc,.docx" hidden>
@@ -210,28 +281,52 @@
         </div>
       </div>
 
-      <div class="resume-template-card">
-        <h3>📋 Resume Templates</h3>
+      <div class="card">
+        <div class="card-title">
+          <span class="icon icon-md"><svg viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+            </svg></span>
+          Resume Templates
+        </div>
         <p class="card-desc">FAANG-optimized templates based on Jake's Resume format</p>
         <div class="template-grid">
           <button class="template-btn active" data-template="jakes">
-            <span class="template-icon">📐</span>
-            <span>Jake's Classic</span>
+            <span class="icon"><svg viewBox="0 0 24 24">
+                <line x1="17" y1="10" x2="3" y2="10" />
+                <line x1="21" y1="6" x2="3" y2="6" />
+                <line x1="21" y1="14" x2="3" y2="14" />
+                <line x1="17" y1="18" x2="3" y2="18" />
+              </svg></span>
+            <span>Classic</span>
           </button>
           <button class="template-btn" data-template="faang">
-            <span class="template-icon">🏢</span>
-            <span>FAANG Modern</span>
+            <span class="icon"><svg viewBox="0 0 24 24">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+              </svg></span>
+            <span>FAANG</span>
           </button>
           <button class="template-btn" data-template="minimal">
-            <span class="template-icon">✨</span>
-            <span>Minimal Pro</span>
+            <span class="icon"><svg viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg></span>
+            <span>Minimal</span>
           </button>
         </div>
       </div>
 
       <div class="resume-actions">
         <button class="btn btn-primary btn-full" id="btn-analyze-resume" disabled>
-          📊 Analyze My Resume
+          <span class="icon icon-sm"><svg viewBox="0 0 24 24">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg></span>
+          Analyze My Resume
         </button>
         <div class="ats-result" id="ats-result" style="display:none;">
           <div class="ats-score-ring">
@@ -252,13 +347,24 @@
         <h2>Settings</h2>
       </div>
 
-      <div class="settings-card">
-        <h3>🔑 API Keys</h3>
+      <div class="card">
+        <div class="card-title">
+          <span class="icon icon-md"><svg viewBox="0 0 24 24">
+              <path
+                d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+            </svg></span>
+          API Keys
+        </div>
         <div class="form-group">
           <label>Gemini API Key</label>
           <div class="input-group">
             <input type="password" id="gemini-key" placeholder="AIza..." class="input">
-            <button class="btn btn-sm" id="toggle-gemini-key">👁</button>
+            <button class="btn btn-sm btn-ghost" id="toggle-gemini-key">
+              <span class="icon icon-sm"><svg viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg></span>
+            </button>
           </div>
           <span class="input-hint">Get yours free at <a href="https://aistudio.google.com/apikey" target="_blank">Google
               AI Studio</a></span>
@@ -267,15 +373,26 @@
           <label>SerpApi Key</label>
           <div class="input-group">
             <input type="password" id="serpapi-key" placeholder="your serpapi key" class="input">
-            <button class="btn btn-sm" id="toggle-serpapi-key">👁</button>
+            <button class="btn btn-sm btn-ghost" id="toggle-serpapi-key">
+              <span class="icon icon-sm"><svg viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg></span>
+            </button>
           </div>
           <span class="input-hint">Get 100 free searches/month at <a href="https://serpapi.com"
               target="_blank">serpapi.com</a></span>
         </div>
       </div>
 
-      <div class="settings-card">
-        <h3>👤 Job Profile</h3>
+      <div class="card">
+        <div class="card-title">
+          <span class="icon icon-md"><svg viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg></span>
+          Job Profile
+        </div>
         <div class="form-group">
           <label>Target Role</label>
           <input type="text" id="profile-role" placeholder="Senior Software Engineer" class="input">
@@ -286,7 +403,7 @@
         </div>
         <div class="form-group">
           <label>Key Skills (comma-separated)</label>
-          <textarea id="profile-skills" placeholder="JavaScript, React, Node.js, Python, AWS, System Design"
+          <textarea id="profile-skills" placeholder="JavaScript, React, Node.js, Python, AWS"
             class="input textarea"></textarea>
         </div>
         <div class="form-group">
@@ -299,8 +416,14 @@
         </div>
       </div>
 
-      <div class="settings-card">
-        <h3>🔔 Notifications</h3>
+      <div class="card">
+        <div class="card-title">
+          <span class="icon icon-md"><svg viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg></span>
+          Notifications
+        </div>
         <div class="form-group">
           <label>Auto-search Interval</label>
           <select id="notif-interval" class="input">
@@ -323,9 +446,14 @@
       </div>
 
       <button class="btn btn-primary btn-full" id="btn-save-settings">
-        💾 Save All Settings
+        <span class="icon icon-sm"><svg viewBox="0 0 24 24">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg></span>
+        Save All Settings
       </button>
-      <div class="save-feedback" id="save-feedback" style="display:none;">✅ Settings saved!</div>
+      <div class="save-feedback" id="save-feedback" style="display:none;">Settings saved successfully</div>
     </div>
   </div>
 
