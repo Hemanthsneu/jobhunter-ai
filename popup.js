@@ -298,7 +298,7 @@
         try {
             if (file.name.toLowerCase().endsWith('.pdf')) {
                 if (typeof PDFExtractor !== 'undefined') {
-                    text = await PDFExtractor.extractFromFile(file);
+                    text = await PDFExtractor.extractText(file);
                 } else {
                     // Fallback: try reading as text
                     text = await readFileAsText(file);
