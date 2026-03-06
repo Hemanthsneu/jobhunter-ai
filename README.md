@@ -16,7 +16,7 @@ JobHunter AI is an open-source, AI-powered Chrome extension designed to supercha
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/YOUR_GITHUB_USERNAME/jobhunter-ai.git
+   git clone https://github.com/Hemanthsneu/jobhunter-ai.git
    ```
 2. Open Google Chrome and navigate to `chrome://extensions/`.
 3. Enable **Developer mode** in the top-right corner.
