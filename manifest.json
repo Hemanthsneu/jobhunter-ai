@@ -1,0 +1,85 @@
+{
+  "manifest_version": 3,
+  "name": "JobHunter AI",
+  "version": "1.0.0",
+  "description": "AI-powered job search automation with resume tailoring, ATS scoring, and smart notifications",
+  "permissions": [
+    "storage",
+    "notifications",
+    "alarms",
+    "activeTab",
+    "sidePanel",
+    "tabs",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://www.indeed.com/*",
+    "https://www.glassdoor.com/*",
+    "https://serpapi.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://www.google.com/*",
+    "https://boards.greenhouse.io/*",
+    "https://jobs.ashby.io/*",
+    "https://jobs.lever.co/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/jobs/*"
+      ],
+      "js": [
+        "content/common.js",
+        "content/linkedin.js"
+      ],
+      "css": [
+        "content/content.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://www.indeed.com/*"
+      ],
+      "js": [
+        "content/common.js",
+        "content/indeed.js"
+      ],
+      "css": [
+        "content/content.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://boards.greenhouse.io/*",
+        "https://jobs.ashby.io/*",
+        "https://jobs.lever.co/*"
+      ],
+      "js": [
+        "content/common.js",
+        "content/ats-boards.js"
+      ],
+      "css": [
+        "content/content.css"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobHunter AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <span class="logo-icon">🎯</span>
+          <h1>JobHunter <span class="ai-badge">AI</span></h1>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="stats-mini">
+          <div class="stat-pill" id="stat-jobs" title="Jobs Found">
+            <span class="stat-icon">📋</span>
+            <span class="stat-value">0</span>
+          </div>
+          <div class="stat-pill" id="stat-applied" title="Applied">
+            <span class="stat-icon">✅</span>
+            <span class="stat-value">0</span>
+          </div>
+          <div class="stat-pill" id="stat-ats" title="Avg ATS Score">
+            <span class="stat-icon">📊</span>
+            <span class="stat-value">--</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="jobs">
+        <span class="tab-icon">🔍</span>
+        <span class="tab-label">Jobs</span>
+      </button>
+      <button class="tab-btn" data-tab="search">
+        <span class="tab-icon">🚀</span>
+        <span class="tab-label">Hunt</span>
+      </button>
+      <button class="tab-btn" data-tab="tracker">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">Tracker</span>
+      </button>
+      <button class="tab-btn" data-tab="resume">
+        <span class="tab-icon">📄</span>
+        <span class="tab-label">Resume</span>
+      </button>
+      <button class="tab-btn" data-tab="settings">
+        <span class="tab-icon">⚙️</span>
+        <span class="tab-label">Settings</span>
+      </button>
+    </nav>
+
+    <!-- JOBS TAB -->
+    <div class="tab-content active" id="tab-jobs">
+      <div class="section-header">
+        <h2>Latest Job Matches</h2>
+        <button class="btn btn-sm btn-primary" id="btn-refresh-jobs">
+          <span>↻</span> Refresh
+        </button>
+      </div>
+      <div class="filters-bar">
+        <select id="filter-match" class="filter-select">
+          <option value="all">All Matches</option>
+          <option value="90">90%+ Match</option>
+          <option value="75">75%+ Match</option>
+          <option value="50">50%+ Match</option>
+        </select>
+        <select id="filter-source" class="filter-select">
+          <option value="all">All Sources</option>
+          <option value="google">Google Jobs</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="greenhouse">Greenhouse</option>
+          <option value="lever">Lever</option>
+          <option value="ashby">Ashby</option>
+        </select>
+      </div>
+      <div class="job-list" id="job-list">
+        <div class="empty-state">
+          <div class="empty-icon">🎯</div>
+          <p>Set up your profile & API keys in <strong>Settings</strong>, then click <strong>Hunt</strong> to find jobs!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUNT TAB -->
+    <div class="tab-content" id="tab-search">
+      <div class="section-header">
+        <h2>🚀 Job Hunt</h2>
+      </div>
+
+      <div class="hunt-card">
+        <h3>Quick Search</h3>
+        <div class="form-group">
+          <label>Job Title / Keywords</label>
+          <input type="text" id="search-query" placeholder="Senior Software Engineer" class="input">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="search-location" placeholder="Remote, USA" class="input">
+          </div>
+          <div class="form-group">
+            <label>Posted Within</label>
+            <select id="search-age" class="input">
+              <option value="1">Last Hour</option>
+              <option value="24" selected>Last 24 Hours</option>
+              <option value="72">Last 3 Days</option>
+              <option value="168">Last 7 Days</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" id="btn-search-jobs">
+          🔍 Search Jobs Now
+        </button>
+      </div>
+
+      <div class="hunt-card">
+        <h3>🎯 Smart Hunt — ATS Board Crawler</h3>
+        <p class="card-desc">Auto-search Greenhouse, Ashby, Lever & more for the freshest postings</p>
+        <div class="hunt-sources">
+          <label class="checkbox-label">
+            <input type="checkbox" checked data-source="greenhouse"> Greenhouse
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" checked data-source="ashby"> Ashby
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" checked data-source="lever"> Lever
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" checked data-source="linkedin"> LinkedIn
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" checked data-source="google"> Google Jobs
+          </label>
+        </div>
+        <button class="btn btn-accent btn-full" id="btn-smart-hunt">
+          🚀 Launch Smart Hunt
+        </button>
+        <div class="hunt-progress" id="hunt-progress" style="display:none;">
+          <div class="progress-bar">
+            <div class="progress-fill" id="hunt-progress-fill"></div>
+          </div>
+          <p class="progress-text" id="hunt-progress-text">Searching...</p>
+        </div>
+      </div>
+
+      <div class="hunt-card">
+        <h3>⚡ Quick Links — Latest Jobs</h3>
+        <p class="card-desc">Open pre-filtered searches in new tabs</p>
+        <div class="quick-links" id="quick-links">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACKER TAB -->
+    <div class="tab-content" id="tab-tracker">
+      <div class="section-header">
+        <h2>Application Tracker</h2>
+        <div class="tracker-stats" id="tracker-stats"></div>
+      </div>
+      <div class="tracker-filters">
+        <button class="filter-chip active" data-status="all">All</button>
+        <button class="filter-chip" data-status="saved">Saved</button>
+        <button class="filter-chip" data-status="applied">Applied</button>
+        <button class="filter-chip" data-status="interview">Interview</button>
+        <button class="filter-chip" data-status="offer">Offer</button>
+        <button class="filter-chip" data-status="rejected">Rejected</button>
+      </div>
+      <div class="tracker-list" id="tracker-list">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <p>No tracked applications yet. Click <strong>"Save"</strong> or <strong>"Applied"</strong> on any job to
+            start tracking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESUME TAB -->
+    <div class="tab-content" id="tab-resume">
+      <div class="section-header">
+        <h2>Resume Manager</h2>
+      </div>
+
+      <div class="resume-upload-card" id="resume-upload-area">
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">📄</div>
+          <p>Drag & drop your resume or <label for="resume-file" class="upload-link">browse</label></p>
+          <p class="upload-hint">Supports .txt and .pdf files</p>
+          <input type="file" id="resume-file" accept=".txt,.pdf,.doc,.docx" hidden>
+        </div>
+        <div class="resume-preview" id="resume-preview" style="display:none;">
+          <div class="preview-header">
+            <span class="preview-name" id="resume-filename"></span>
+            <button class="btn btn-sm btn-danger" id="btn-remove-resume">Remove</button>
+          </div>
+          <div class="resume-text" id="resume-text-preview"></div>
+        </div>
+      </div>
+
+      <div class="resume-template-card">
+        <h3>📋 Resume Templates</h3>
+        <p class="card-desc">FAANG-optimized templates based on Jake's Resume format</p>
+        <div class="template-grid">
+          <button class="template-btn active" data-template="jakes">
+            <span class="template-icon">📐</span>
+            <span>Jake's Classic</span>
+          </button>
+          <button class="template-btn" data-template="faang">
+            <span class="template-icon">🏢</span>
+            <span>FAANG Modern</span>
+          </button>
+          <button class="template-btn" data-template="minimal">
+            <span class="template-icon">✨</span>
+            <span>Minimal Pro</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="resume-actions">
+        <button class="btn btn-primary btn-full" id="btn-analyze-resume" disabled>
+          📊 Analyze My Resume
+        </button>
+        <div class="ats-result" id="ats-result" style="display:none;">
+          <div class="ats-score-ring">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="54" class="score-bg" />
+              <circle cx="60" cy="60" r="54" class="score-fill" id="ats-score-ring" />
+            </svg>
+            <div class="score-text" id="ats-score-text">--</div>
+          </div>
+          <div class="ats-details" id="ats-details"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-content" id="tab-settings">
+      <div class="section-header">
+        <h2>Settings</h2>
+      </div>
+
+      <div class="settings-card">
+        <h3>🔑 API Keys</h3>
+        <div class="form-group">
+          <label>Gemini API Key</label>
+          <div class="input-group">
+            <input type="password" id="gemini-key" placeholder="AIza..." class="input">
+            <button class="btn btn-sm" id="toggle-gemini-key">👁</button>
+          </div>
+          <span class="input-hint">Get yours free at <a href="https://aistudio.google.com/apikey" target="_blank">Google
+              AI Studio</a></span>
+        </div>
+        <div class="form-group">
+          <label>SerpApi Key</label>
+          <div class="input-group">
+            <input type="password" id="serpapi-key" placeholder="your serpapi key" class="input">
+            <button class="btn btn-sm" id="toggle-serpapi-key">👁</button>
+          </div>
+          <span class="input-hint">Get 100 free searches/month at <a href="https://serpapi.com"
+              target="_blank">serpapi.com</a></span>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>👤 Job Profile</h3>
+        <div class="form-group">
+          <label>Target Role</label>
+          <input type="text" id="profile-role" placeholder="Senior Software Engineer" class="input">
+        </div>
+        <div class="form-group">
+          <label>Years of Experience</label>
+          <input type="number" id="profile-yoe" placeholder="5" class="input" min="0" max="40">
+        </div>
+        <div class="form-group">
+          <label>Key Skills (comma-separated)</label>
+          <textarea id="profile-skills" placeholder="JavaScript, React, Node.js, Python, AWS, System Design"
+            class="input textarea"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Preferred Locations</label>
+          <input type="text" id="profile-locations" placeholder="Remote, San Francisco, New York" class="input">
+        </div>
+        <div class="form-group">
+          <label>Min Salary (USD/year)</label>
+          <input type="number" id="profile-salary" placeholder="150000" class="input">
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>🔔 Notifications</h3>
+        <div class="form-group">
+          <label>Auto-search Interval</label>
+          <select id="notif-interval" class="input">
+            <option value="30">Every 30 minutes</option>
+            <option value="60" selected>Every hour</option>
+            <option value="180">Every 3 hours</option>
+            <option value="360">Every 6 hours</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notify when match score above</label>
+          <div class="range-group">
+            <input type="range" id="notif-threshold" min="50" max="95" value="75" class="range-input">
+            <span class="range-value" id="notif-threshold-value">75%</span>
+          </div>
+        </div>
+        <label class="checkbox-label">
+          <input type="checkbox" id="notif-enabled" checked> Enable notifications
+        </label>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="btn-save-settings">
+        💾 Save All Settings
+      </button>
+      <div class="save-feedback" id="save-feedback" style="display:none;">✅ Settings saved!</div>
+    </div>
+  </div>
+
+  <script src="lib/storage.js"></script>
+  <script src="lib/gemini.js"></script>
+  <script src="lib/ats-scorer.js"></script>
+  <script src="lib/job-search.js"></script>
+  <script src="lib/resume-templates.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>

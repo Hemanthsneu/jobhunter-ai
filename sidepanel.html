@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobHunter AI — Analysis</title>
+    <link rel="stylesheet" href="sidepanel.css">
+</head>
+
+<body>
+    <div class="panel">
+        <header class="panel-header">
+            <h1>🎯 JobHunter AI</h1>
+            <p class="panel-subtitle">Deep Job Analysis</p>
+        </header>
+
+        <div class="panel-status" id="panel-status">
+            <div class="status-waiting">
+                <div class="status-icon">🔍</div>
+                <p>Click <strong>"Analyze"</strong> on any job listing to start analysis.</p>
+                <p class="status-hint">Works on LinkedIn, Indeed, Greenhouse, Ashby, and Lever.</p>
+            </div>
+        </div>
+
+        <div class="panel-content" id="panel-content" style="display:none;">
+            <!-- Job Header -->
+            <div class="job-header" id="job-header">
+                <h2 class="job-title" id="job-title"></h2>
+                <p class="job-company" id="job-company"></p>
+                <p class="job-location" id="job-location"></p>
+            </div>
+
+            <!-- ATS Score Section -->
+            <div class="score-section" id="score-section">
+                <h3>📊 ATS Score Analysis</h3>
+                <div class="score-main">
+                    <div class="score-circle">
+                        <svg viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="54" class="score-bg" />
+                            <circle cx="60" cy="60" r="54" class="score-fill" id="score-ring" />
+                        </svg>
+                        <div class="score-number" id="score-number">--</div>
+                    </div>
+                    <div class="score-breakdown" id="score-breakdown"></div>
+                </div>
+            </div>
+
+            <!-- Keyword Analysis -->
+            <div class="keywords-section" id="keywords-section">
+                <h3>🔑 Keyword Analysis</h3>
+                <div class="keyword-groups">
+                    <div class="keyword-group">
+                        <h4>✅ Matching Keywords</h4>
+                        <div class="keyword-list keyword-list-match" id="keywords-match"></div>
+                    </div>
+                    <div class="keyword-group">
+                        <h4>❌ Missing Keywords</h4>
+                        <div class="keyword-list keyword-list-missing" id="keywords-missing"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Improvements -->
+            <div class="improvements-section" id="improvements-section">
+                <h3>💡 Top Improvements</h3>
+                <div class="improvements-list" id="improvements-list"></div>
+            </div>
+
+            <!-- Tailored Resume -->
+            <div class="tailored-section" id="tailored-section">
+                <div class="tailored-header">
+                    <h3>✍️ Tailored Resume</h3>
+                    <div class="tailored-actions">
+                        <button class="panel-btn" id="btn-copy-tailored">📋 Copy</button>
+                        <button class="panel-btn" id="btn-preview-tailored">👁 Preview</button>
+                    </div>
+                </div>
+                <div class="tailored-template-select">
+                    <button class="tmpl-btn active" data-template="jakes">Jake's</button>
+                    <button class="tmpl-btn" data-template="faang">FAANG</button>
+                    <button class="tmpl-btn" data-template="minimal">Minimal</button>
+                </div>
+                <div class="tailored-content" id="tailored-content"></div>
+            </div>
+
+            <!-- Cover Letter -->
+            <div class="cover-section" id="cover-section">
+                <div class="cover-header">
+                    <h3>📝 Cover Letter</h3>
+                    <button class="panel-btn" id="btn-gen-cover">Generate</button>
+                </div>
+                <div class="cover-content" id="cover-content" style="display:none;"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="panel-actions">
+                <button class="panel-btn panel-btn-primary" id="btn-save-job">💾 Save to Tracker</button>
+                <button class="panel-btn panel-btn-accent" id="btn-mark-applied">✅ Mark Applied</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="lib/storage.js"></script>
+    <script src="lib/gemini.js"></script>
+    <script src="lib/ats-scorer.js"></script>
+    <script src="lib/resume-templates.js"></script>
+    <script src="sidepanel.js"></script>
+</body>
+
+</html>
