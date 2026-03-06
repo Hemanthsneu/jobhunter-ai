@@ -143,6 +143,121 @@
         inp.type = inp.type === 'password' ? 'text' : 'password';
     });
 
+    // ====== Supabase Auth & Sync ======
+    // Load Supabase settings
+    chrome.storage.sync.get({ supabaseUrl: '', supabaseAnonKey: '' }, (supa) => {
+        const urlEl = document.getElementById('supabase-url');
+        const keyEl = document.getElementById('supabase-anon-key');
+        if (urlEl) urlEl.value = supa.supabaseUrl || '';
+        if (keyEl) keyEl.value = supa.supabaseAnonKey || '';
+    });
+
+    // Initialize Supabase and check auth state
+    async function initSupabase() {
+        if (typeof SupabaseClient === 'undefined') return;
+        const initialized = await SupabaseClient.init();
+        if (!initialized) return;
+
+        const user = await AuthManager.getUser();
+        updateAuthUI(user);
+
+        if (user && typeof CloudSync !== 'undefined') {
+            CloudSync.initialSync();
+        }
+    }
+
+    function updateAuthUI(user) {
+        const signedOut = document.getElementById('auth-signed-out');
+        const signedIn = document.getElementById('auth-signed-in');
+        if (!signedOut || !signedIn) return;
+
+        if (user) {
+            signedOut.style.display = 'none';
+            signedIn.style.display = 'block';
+            const emailEl = document.getElementById('auth-user-email');
+            if (emailEl) emailEl.textContent = user.email || 'User';
+        } else {
+            signedOut.style.display = 'block';
+            signedIn.style.display = 'none';
+        }
+    }
+
+    function showAuthError(msg) {
+        const el = document.getElementById('auth-error');
+        if (el) { el.textContent = msg; el.style.display = 'block'; }
+    }
+
+    // Sign In
+    document.getElementById('btn-sign-in')?.addEventListener('click', async () => {
+        const email = document.getElementById('auth-email')?.value.trim();
+        const password = document.getElementById('auth-password')?.value;
+        if (!email || !password) { showAuthError('Please enter email and password.'); return; }
+
+        try {
+            // Save Supabase settings first
+            const supaUrl = document.getElementById('supabase-url')?.value.trim();
+            const supaKey = document.getElementById('supabase-anon-key')?.value.trim();
+            if (supaUrl && supaKey) {
+                await new Promise(r => chrome.storage.sync.set({ supabaseUrl: supaUrl, supabaseAnonKey: supaKey }, r));
+                await SupabaseClient.init();
+            }
+
+            const data = await AuthManager.signIn(email, password);
+            updateAuthUI(data.user);
+            if (typeof CloudSync !== 'undefined') CloudSync.initialSync();
+        } catch (e) {
+            showAuthError(e.message);
+        }
+    });
+
+    // Sign Up
+    document.getElementById('btn-sign-up')?.addEventListener('click', async () => {
+        const email = document.getElementById('auth-email')?.value.trim();
+        const password = document.getElementById('auth-password')?.value;
+        if (!email || !password) { showAuthError('Please enter email and password.'); return; }
+
+        try {
+            const supaUrl = document.getElementById('supabase-url')?.value.trim();
+            const supaKey = document.getElementById('supabase-anon-key')?.value.trim();
+            if (supaUrl && supaKey) {
+                await new Promise(r => chrome.storage.sync.set({ supabaseUrl: supaUrl, supabaseAnonKey: supaKey }, r));
+                await SupabaseClient.init();
+            }
+
+            const data = await AuthManager.signUp(email, password);
+            if (data.user) {
+                updateAuthUI(data.user);
+            } else {
+                showAuthError('Check your email to confirm your account.');
+            }
+        } catch (e) {
+            showAuthError(e.message);
+        }
+    });
+
+    // Sign Out
+    document.getElementById('btn-sign-out')?.addEventListener('click', async () => {
+        await AuthManager.signOut();
+        updateAuthUI(null);
+    });
+
+    // Manual Sync
+    document.getElementById('btn-sync-now')?.addEventListener('click', async () => {
+        const btn = document.getElementById('btn-sync-now');
+        btn.textContent = 'Syncing...';
+        try {
+            await CloudSync.initialSync();
+            btn.textContent = 'Synced!';
+            setTimeout(() => btn.textContent = 'Sync Now', 2000);
+        } catch (e) {
+            btn.textContent = 'Sync Failed';
+            setTimeout(() => btn.textContent = 'Sync Now', 2000);
+        }
+    });
+
+    // Init Supabase on popup open
+    initSupabase();
+
     // ====== Template Selection ======
     document.querySelectorAll('.template-btn').forEach(btn => {
         btn.addEventListener('click', () => {
