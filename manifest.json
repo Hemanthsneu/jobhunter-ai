@@ -70,7 +70,8 @@
       ],
       "js": [
         "content/common.js",
-        "content/ats-boards.js"
+        "content/ats-boards.js",
+        "content/auto-apply.js"
       ],
       "css": [
         "content/content.css"

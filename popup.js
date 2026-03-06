@@ -73,6 +73,12 @@
     function loadSettings() {
         document.getElementById('gemini-key').value = settings.anthropicKey || '';
         document.getElementById('serpapi-key').value = settings.serpApiKey || '';
+        document.getElementById('profile-name').value = settings.profileName || '';
+        document.getElementById('profile-email').value = settings.profileEmail || '';
+        document.getElementById('profile-phone').value = settings.profilePhone || '';
+        document.getElementById('profile-linkedin').value = settings.profileLinkedin || '';
+        document.getElementById('profile-github').value = settings.profileGithub || '';
+        document.getElementById('needs-sponsorship').checked = settings.needsSponsorship || false;
         document.getElementById('profile-role').value = settings.profileRole || '';
         document.getElementById('profile-yoe').value = settings.profileYOE || '';
         document.getElementById('profile-skills').value = settings.profileSkills || '';
@@ -94,6 +100,12 @@
         const newSettings = {
             anthropicKey: document.getElementById('gemini-key').value.trim(),
             serpApiKey: document.getElementById('serpapi-key').value.trim(),
+            profileName: document.getElementById('profile-name').value.trim(),
+            profileEmail: document.getElementById('profile-email').value.trim(),
+            profilePhone: document.getElementById('profile-phone').value.trim(),
+            profileLinkedin: document.getElementById('profile-linkedin').value.trim(),
+            profileGithub: document.getElementById('profile-github').value.trim(),
+            needsSponsorship: document.getElementById('needs-sponsorship').checked,
             profileRole: document.getElementById('profile-role').value.trim(),
             profileYOE: document.getElementById('profile-yoe').value.trim(),
             profileSkills: document.getElementById('profile-skills').value.trim(),
