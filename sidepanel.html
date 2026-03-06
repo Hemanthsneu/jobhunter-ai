@@ -132,6 +132,28 @@
                 <div class="cover-content" id="cover-content" style="display:none;"></div>
             </div>
 
+            <!-- Interview Prep -->
+            <div class="interview-section" id="interview-section">
+                <div class="cover-header">
+                    <h3>Interview Prep</h3>
+                    <button class="panel-btn" id="btn-gen-interview">Generate Questions</button>
+                </div>
+                <div class="interview-content" id="interview-content" style="display:none;"></div>
+            </div>
+
+            <!-- Follow-Up Email -->
+            <div class="followup-section" id="followup-section">
+                <div class="cover-header">
+                    <h3>Follow-Up Email</h3>
+                    <div style="display:flex;gap:4px;">
+                        <button class="panel-btn" data-stage="applied" id="btn-followup-applied">After Apply</button>
+                        <button class="panel-btn" data-stage="interview" id="btn-followup-interview">Post
+                            Interview</button>
+                    </div>
+                </div>
+                <div class="followup-content" id="followup-content" style="display:none;"></div>
+            </div>
+
             <!-- Actions -->
             <div class="panel-actions">
                 <button class="panel-btn panel-btn-primary" id="btn-save-job">Save to Tracker</button>
@@ -141,9 +163,12 @@
     </div>
 
     <script src="lib/storage.js"></script>
-    <script src="lib/gemini.js"></script>
+    <script src="lib/claude.js"></script>
     <script src="lib/ats-scorer.js"></script>
     <script src="lib/resume-templates.js"></script>
+    <script src="lib/visa-intel.js"></script>
+    <script src="lib/freshness.js"></script>
+    <script src="lib/quota.js"></script>
     <script src="sidepanel.js"></script>
 </body>
 

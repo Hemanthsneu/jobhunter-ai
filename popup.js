@@ -44,7 +44,7 @@
 
     // ====== Onboarding ======
     function checkOnboarding() {
-        const hasKey = !!settings.geminiKey;
+        const hasKey = !!settings.anthropicKey;
         const hasRole = !!settings.profileRole;
         const hasResume = !!currentResumeText;
 
@@ -71,7 +71,7 @@
 
     // ====== Load Settings ======
     function loadSettings() {
-        document.getElementById('gemini-key').value = settings.geminiKey || '';
+        document.getElementById('gemini-key').value = settings.anthropicKey || '';
         document.getElementById('serpapi-key').value = settings.serpApiKey || '';
         document.getElementById('profile-role').value = settings.profileRole || '';
         document.getElementById('profile-yoe').value = settings.profileYOE || '';
@@ -92,7 +92,7 @@
     // ====== Save Settings ======
     document.getElementById('btn-save-settings').addEventListener('click', async () => {
         const newSettings = {
-            geminiKey: document.getElementById('gemini-key').value.trim(),
+            anthropicKey: document.getElementById('gemini-key').value.trim(),
             serpApiKey: document.getElementById('serpapi-key').value.trim(),
             profileRole: document.getElementById('profile-role').value.trim(),
             profileYOE: document.getElementById('profile-yoe').value.trim(),
@@ -170,27 +170,18 @@
         let text = '';
         try {
             if (file.name.toLowerCase().endsWith('.pdf')) {
-                if (settings.geminiKey) {
-                    const base64 = await readFileAsBase64(file);
-                    const response = await fetch(
-                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${settings.geminiKey}`,
-                        {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ parts: [{ text: 'Extract ALL text content from this PDF resume. Return ONLY the raw text exactly as it appears in the document, preserving the structure. Do not add any commentary.' }, { inlineData: { mimeType: 'application/pdf', data: base64 } }] }],
-                                generationConfig: { temperature: 0, maxOutputTokens: 8192 }
-                            })
-                        }
-                    );
-                    const data = await response.json();
-                    text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                if (typeof PDFExtractor !== 'undefined') {
+                    text = await PDFExtractor.extractFromFile(file);
                 } else {
-                    if (uploadZoneEl) {
-                        uploadZoneEl.innerHTML = '<div class="upload-icon" style="color:var(--warning)"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><p style="color:var(--warning)">Add your Gemini API key in Settings first to parse PDF resumes.</p><p class="upload-hint">Or upload as a .txt file instead</p>';
-                        uploadZoneEl.style.display = 'block';
+                    // Fallback: try reading as text
+                    text = await readFileAsText(file);
+                    if (!text || text.length < 50) {
+                        if (uploadZoneEl) {
+                            uploadZoneEl.innerHTML = '<div class="upload-icon" style="color:var(--warning)"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><p style="color:var(--warning)">Could not extract text from this PDF.</p><p class="upload-hint">Try uploading as a .txt file instead</p>';
+                            uploadZoneEl.style.display = 'block';
+                        }
+                        return;
                     }
-                    return;
                 }
             } else {
                 text = await readFileAsText(file);
@@ -265,10 +256,10 @@
         const quickResult = ATSScorer.quickScore(currentResumeText, settings.profileSkills || 'software engineer');
         displayATSScore(quickResult);
 
-        if (settings.geminiKey) {
+        if (settings.anthropicKey) {
             try {
-                const deepResult = await GeminiAI.calculateATSScore(
-                    settings.geminiKey,
+                const deepResult = await ClaudeAI.calculateATSScore(
+                    settings.anthropicKey,
                     currentResumeText,
                     `Role: ${settings.profileRole || 'Senior Software Engineer'}\nRequired Skills: ${settings.profileSkills || 'Not specified'}`
                 );
@@ -276,7 +267,7 @@
                     displayATSScore({ overallScore: deepResult.overallScore, breakdown: deepResult.breakdown, improvements: deepResult.topImprovements });
                 }
             } catch (e) {
-                console.error('Gemini ATS analysis failed:', e);
+                console.error('Claude ATS analysis failed:', e);
             }
         }
 
@@ -327,10 +318,10 @@
             if (settings.serpApiKey) {
                 const jobs = await JobSearch.searchGoogleJobs(settings.serpApiKey, query, location, { hoursAgo });
 
-                if (settings.geminiKey && currentResumeText && jobs.length > 0) {
+                if (settings.anthropicKey && currentResumeText && jobs.length > 0) {
                     for (const job of jobs.slice(0, 5)) {
                         try {
-                            const match = await GeminiAI.analyzeJobMatch(settings.geminiKey, currentResumeText, job.description, {
+                            const match = await ClaudeAI.analyzeJobMatch(settings.anthropicKey, currentResumeText, job.description, {
                                 role: settings.profileRole, yoe: settings.profileYOE, skills: settings.profileSkills
                             });
                             job.matchScore = match.matchScore || 0;
@@ -371,10 +362,10 @@
                 for (const job of result.jobs) { await StorageManager.saveJob(job); }
                 tabBtns[0].click();
 
-                if (settings.geminiKey && currentResumeText) {
+                if (settings.anthropicKey && currentResumeText) {
                     for (const job of result.jobs.slice(0, 5)) {
                         try {
-                            const match = await GeminiAI.analyzeJobMatch(settings.geminiKey, currentResumeText, job.description, {
+                            const match = await ClaudeAI.analyzeJobMatch(settings.anthropicKey, currentResumeText, job.description, {
                                 role: settings.profileRole, yoe: settings.profileYOE, skills: settings.profileSkills
                             });
                             job.matchScore = match.matchScore || 0;
@@ -487,7 +478,7 @@
 
     // ====== Analyze & Tailor for specific job ======
     async function analyzeAndTailorJob(job) {
-        if (!settings.geminiKey) { alert('Please add your Gemini API key in Settings first.'); return; }
+        if (!settings.anthropicKey) { alert('Please add your Anthropic API key in Settings first.'); return; }
         if (!currentResumeText) { alert('Please upload your resume in the Resume tab first.'); return; }
 
         try {
@@ -513,8 +504,8 @@
         }
 
         try {
-            const atsResult = await GeminiAI.calculateATSScore(settings.geminiKey, currentResumeText, job.description);
-            const tailoredResume = await GeminiAI.tailorResume(settings.geminiKey, currentResumeText, job.description, template, {
+            const atsResult = await ClaudeAI.calculateATSScore(settings.anthropicKey, currentResumeText, job.description);
+            const tailoredResume = await ClaudeAI.tailorResume(settings.anthropicKey, currentResumeText, job.description, template, {
                 name: settings.profileName || '', role: settings.profileRole || '', yoe: settings.profileYOE || ''
             });
 

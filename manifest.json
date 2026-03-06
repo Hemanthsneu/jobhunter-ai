@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "JobHunter AI",
-  "version": "1.0.0",
-  "description": "AI-powered job search automation with resume tailoring, ATS scoring, and smart notifications",
+  "version": "2.0.0",
+  "description": "AI-powered job search with Claude AI resume tailoring, H1B detection, interview prep, and auto-apply",
   "permissions": [
     "storage",
     "notifications",
@@ -17,7 +17,7 @@
     "https://www.indeed.com/*",
     "https://www.glassdoor.com/*",
     "https://serpapi.com/*",
-    "https://generativelanguage.googleapis.com/*",
+    "https://api.anthropic.com/*",
     "https://www.google.com/*",
     "https://boards.greenhouse.io/*",
     "https://jobs.ashby.io/*",

@@ -120,7 +120,7 @@
         <h3>Welcome to JobHunter AI</h3>
         <p>Complete setup to start finding your perfect role.</p>
         <div class="setup-steps">
-          <div class="setup-step" id="step-api"><span class="step-num">1</span> Add your Gemini API key</div>
+          <div class="setup-step" id="step-api"><span class="step-num">1</span> Add your Anthropic API key</div>
           <div class="setup-step" id="step-profile"><span class="step-num">2</span> Set your target role</div>
           <div class="setup-step" id="step-resume"><span class="step-num">3</span> Upload your resume</div>
         </div>
@@ -356,9 +356,9 @@
           API Keys
         </div>
         <div class="form-group">
-          <label>Gemini API Key</label>
+          <label>Anthropic API Key</label>
           <div class="input-group">
-            <input type="password" id="gemini-key" placeholder="AIza..." class="input">
+            <input type="password" id="gemini-key" placeholder="sk-ant-..." class="input">
             <button class="btn btn-sm btn-ghost" id="toggle-gemini-key">
               <span class="icon icon-sm"><svg viewBox="0 0 24 24">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -366,8 +366,8 @@
                 </svg></span>
             </button>
           </div>
-          <span class="input-hint">Get yours free at <a href="https://aistudio.google.com/apikey" target="_blank">Google
-              AI Studio</a></span>
+          <span class="input-hint">Get yours at <a href="https://console.anthropic.com/settings/keys"
+              target="_blank">Anthropic Console</a> (~$2-5/mo for typical usage)</span>
         </div>
         <div class="form-group">
           <label>SerpApi Key</label>
@@ -458,10 +458,15 @@
   </div>
 
   <script src="lib/storage.js"></script>
-  <script src="lib/gemini.js"></script>
+  <script src="lib/pdf-extractor.js"></script>
+  <script src="lib/claude.js"></script>
   <script src="lib/ats-scorer.js"></script>
   <script src="lib/job-search.js"></script>
   <script src="lib/resume-templates.js"></script>
+  <script src="lib/analytics.js"></script>
+  <script src="lib/visa-intel.js"></script>
+  <script src="lib/freshness.js"></script>
+  <script src="lib/quota.js"></script>
   <script src="popup.js"></script>
 </body>
 

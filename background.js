@@ -85,12 +85,12 @@ async function runScheduledSearch() {
 
         if (jobs.length === 0) return;
 
-        // Score jobs with Gemini if key available
+        // Score jobs with Claude if key available
         const resume = await getResumeFromDB();
-        if (settings.geminiKey && resume) {
+        if (settings.anthropicKey && resume) {
             for (const job of jobs.slice(0, 3)) { // Score top 3 to save API calls
                 try {
-                    const matchResult = await analyzeJobWithGemini(settings.geminiKey, resume, job.description, settings);
+                    const matchResult = await analyzeJobWithClaude(settings.anthropicKey, resume, job.description, settings);
                     job.matchScore = matchResult.matchScore || 0;
                 } catch (e) {
                     console.warn('Scoring failed:', e);
@@ -273,7 +273,7 @@ function generateLinkedInURL(query, location, options = {}) {
 async function getSettings() {
     return new Promise((resolve) => {
         chrome.storage.sync.get({
-            geminiKey: '',
+            anthropicKey: '',
             serpApiKey: '',
             profileRole: '',
             profileYOE: '',
@@ -324,24 +324,28 @@ async function getResumeFromDB() {
     }
 }
 
-async function analyzeJobWithGemini(apiKey, resume, jobDesc, settings) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+async function analyzeJobWithClaude(apiKey, resume, jobDesc, settings) {
+    const prompt = `Rate match 0-100 and list key matches/gaps. Resume: ${resume.substring(0, 2000)} | Job: ${jobDesc.substring(0, 2000)} | Target: ${settings.profileRole}. Respond ONLY with JSON: {"matchScore": N, "summary": "..."}`;
 
-    const prompt = `Rate match 0-100 and list key matches/gaps. Resume: ${resume.substring(0, 2000)} | Job: ${jobDesc.substring(0, 2000)} | Target: ${settings.profileRole}. JSON: {"matchScore": N, "summary": "..."}`;
-
-    const response = await fetch(url, {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+        },
         body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.3, maxOutputTokens: 512 }
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 512,
+            messages: [{ role: 'user', content: prompt }]
         })
     });
 
-    if (!response.ok) throw new Error('Gemini API error');
+    if (!response.ok) throw new Error('Claude API error');
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = data.content?.[0]?.text || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     return jsonMatch ? JSON.parse(jsonMatch[0]) : { matchScore: 0 };
 }

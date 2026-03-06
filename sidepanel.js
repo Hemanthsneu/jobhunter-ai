@@ -69,10 +69,10 @@
             return;
         }
 
-        if (!analysisSettings.geminiKey) {
+        if (!analysisSettings.anthropicKey) {
             document.getElementById('score-section').innerHTML = `
         <h3>📊 ATS Score Analysis</h3>
-        <p style="color: var(--warning); padding: 10px;">⚠️ Add your Gemini API key in Settings for AI-powered analysis.</p>
+        <p style="color: var(--warning); padding: 10px;">⚠️ Add your Anthropic API key in Settings for AI-powered analysis.</p>
       `;
 
             // Still do local ATS scoring
@@ -89,8 +89,8 @@
         try {
             // Run ATS analysis and job match in parallel
             const [atsResult, matchResult] = await Promise.all([
-                GeminiAI.calculateATSScore(analysisSettings.geminiKey, resumeText, job.description || job.title),
-                GeminiAI.analyzeJobMatch(analysisSettings.geminiKey, resumeText, job.description || job.title, {
+                ClaudeAI.calculateATSScore(analysisSettings.anthropicKey, resumeText, job.description || job.title),
+                ClaudeAI.analyzeJobMatch(analysisSettings.anthropicKey, resumeText, job.description || job.title, {
                     role: analysisSettings.profileRole,
                     yoe: analysisSettings.profileYOE,
                     skills: analysisSettings.profileSkills
@@ -113,8 +113,8 @@
             }
 
             // Auto-generate tailored resume
-            const tailored = await GeminiAI.tailorResume(
-                analysisSettings.geminiKey,
+            const tailored = await ClaudeAI.tailorResume(
+                analysisSettings.anthropicKey,
                 resumeText,
                 job.description || job.title,
                 currentTemplate,
@@ -231,13 +231,13 @@
             btn.classList.add('active');
             currentTemplate = btn.dataset.template;
 
-            if (currentJob && settings.geminiKey) {
+            if (currentJob && settings.anthropicKey) {
                 const savedResume = await StorageManager.getResume('primary');
                 if (savedResume?.text) {
                     document.getElementById('tailored-content').innerHTML = '<div class="loading-shimmer" style="width:100%; height:100px;"></div>';
                     try {
-                        const tailored = await GeminiAI.tailorResume(
-                            settings.geminiKey,
+                        const tailored = await ClaudeAI.tailorResume(
+                            settings.anthropicKey,
                             savedResume.text,
                             currentJob.description || currentJob.title,
                             currentTemplate,
@@ -301,7 +301,7 @@
 
     // Generate cover letter
     document.getElementById('btn-gen-cover').addEventListener('click', async () => {
-        if (!currentJob || !settings.geminiKey) return;
+        if (!currentJob || !settings.anthropicKey) return;
 
         const btn = document.getElementById('btn-gen-cover');
         const content = document.getElementById('cover-content');
@@ -311,8 +311,8 @@
 
         try {
             const savedResume = await StorageManager.getResume('primary');
-            const letter = await GeminiAI.generateCoverLetter(
-                settings.geminiKey,
+            const letter = await ClaudeAI.generateCoverLetter(
+                settings.anthropicKey,
                 savedResume?.text || '',
                 currentJob.description || currentJob.title,
                 currentJob.company || ''
@@ -324,6 +324,91 @@
 
         btn.textContent = 'Generate';
     });
+
+    // Generate Interview Prep
+    document.getElementById('btn-gen-interview').addEventListener('click', async () => {
+        if (!currentJob || !settings.anthropicKey) return;
+
+        const btn = document.getElementById('btn-gen-interview');
+        const content = document.getElementById('interview-content');
+        btn.textContent = 'Generating...';
+        content.style.display = 'block';
+        content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:200px;"></div>';
+
+        try {
+            const savedResume = await StorageManager.getResume('primary');
+            const questions = await ClaudeAI.generateInterviewPrep(
+                settings.anthropicKey,
+                currentJob.description || currentJob.title,
+                savedResume?.text || '',
+                currentJob.title || ''
+            );
+
+            if (Array.isArray(questions)) {
+                const categories = {};
+                questions.forEach(q => {
+                    if (!categories[q.category]) categories[q.category] = [];
+                    categories[q.category].push(q);
+                });
+
+                let html = '';
+                for (const [cat, qs] of Object.entries(categories)) {
+                    html += `<div class="interview-category">
+                        <h4 style="margin:12px 0 8px;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">${cat}</h4>`;
+                    qs.forEach((q, i) => {
+                        html += `<details class="interview-card" style="margin-bottom:8px;background:var(--bg-elevated);border-radius:8px;padding:0;">
+                            <summary style="padding:10px 12px;cursor:pointer;font-size:12px;font-weight:500;list-style:none;display:flex;align-items:center;gap:8px;">
+                                <span style="background:${q.difficulty === 'Hard' ? 'var(--error)' : q.difficulty === 'Medium' ? 'var(--warning)' : 'var(--success)'};color:white;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;">${q.difficulty}</span>
+                                ${q.question}
+                            </summary>
+                            <div style="padding:0 12px 12px;font-size:11px;color:var(--text-secondary);line-height:1.5;">
+                                <p style="margin-bottom:6px;"><strong style="color:var(--text-primary);">Why they ask:</strong> ${q.whyTheyAsk}</p>
+                                <p style="margin-bottom:6px;"><strong style="color:var(--text-primary);">Answer framework:</strong> ${q.answerFramework}</p>
+                                <p><strong style="color:var(--error);">Red flags:</strong> ${q.redFlags}</p>
+                            </div>
+                        </details>`;
+                    });
+                    html += '</div>';
+                }
+                content.innerHTML = html;
+            } else {
+                content.textContent = 'Could not generate questions. Please try again.';
+            }
+        } catch (e) {
+            content.textContent = 'Error: ' + e.message;
+        }
+        btn.textContent = 'Generate Questions';
+    });
+
+    // Follow-Up Emails
+    const followUpHandler = async (stage) => {
+        if (!currentJob || !settings.anthropicKey) return;
+
+        const content = document.getElementById('followup-content');
+        content.style.display = 'block';
+        content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:80px;"></div>';
+
+        try {
+            const email = await ClaudeAI.generateFollowUp(
+                settings.anthropicKey,
+                { company: currentJob.company, title: currentJob.title, resumeSummary: '' },
+                stage
+            );
+            content.innerHTML = `
+                <div style="white-space:pre-wrap;font-size:12px;line-height:1.6;padding:12px;background:var(--bg-elevated);border-radius:8px;">${email}</div>
+                <button class="panel-btn" id="btn-copy-email" style="margin-top:8px;">Copy to Clipboard</button>
+            `;
+            document.getElementById('btn-copy-email').addEventListener('click', () => {
+                navigator.clipboard.writeText(email);
+                document.getElementById('btn-copy-email').textContent = 'Copied!';
+                setTimeout(() => document.getElementById('btn-copy-email').textContent = 'Copy to Clipboard', 2000);
+            });
+        } catch (e) {
+            content.textContent = 'Error: ' + e.message;
+        }
+    };
+    document.getElementById('btn-followup-applied').addEventListener('click', () => followUpHandler('applied'));
+    document.getElementById('btn-followup-interview').addEventListener('click', () => followUpHandler('interview'));
 
     // Save job
     document.getElementById('btn-save-job').addEventListener('click', async () => {
