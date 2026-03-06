@@ -1,246 +1,130 @@
 /* ========================================
-   JobHunter AI — Content Script Styles
-   Aurora Glassmorphism — Injected on job boards
+   JobHunter AI — Content Scripts Clean Monochrome
+   Injected elements on LinkedIn/Indeed/ATS boards
    ======================================== */
 
-/* ====== Buttons ====== */
+/* ====== Analyze Button ====== */
 .jh-btn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 6px 14px;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
-    color: white;
-    border: none;
-    border-radius: 10px;
+    gap: 4px;
+    padding: 6px 12px;
+    background: #111;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3), 0 0 40px rgba(99, 102, 241, 0.08);
+    transition: all 0.15s ease;
     z-index: 9999;
     position: relative;
-    overflow: hidden;
-}
-
-.jh-btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.25s;
 }
 
 .jh-btn:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4), 0 0 60px rgba(168, 85, 247, 0.15);
-}
-
-.jh-btn:hover::after {
-    opacity: 1;
+    background: #222;
+    border-color: #555;
 }
 
 .jh-btn:active {
-    transform: translateY(0) scale(0.98);
-}
-
-/* ====== Card Actions Container ====== */
-.jh-card-actions {
-    display: flex;
-    gap: 6px;
-    padding: 6px 0;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.jh-detail-actions {
-    display: flex;
-    gap: 8px;
-    padding: 12px 0;
-    align-items: center;
-    flex-wrap: wrap;
-    border-top: 1px solid rgba(99, 102, 241, 0.15);
-    margin-top: 10px;
+    transform: scale(0.97);
 }
 
 /* ====== Score Badge ====== */
 .jh-score-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 3px 12px;
-    border-radius: 9999px;
-    font-size: 12px;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
     font-weight: 700;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     z-index: 9999;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.jh-score-badge:hover {
-    transform: translateY(-1px);
+    position: relative;
 }
 
 .jh-score-high {
-    background: rgba(52, 211, 153, 0.12);
-    color: #34d399;
-    border: 1px solid rgba(52, 211, 153, 0.2);
-    box-shadow: 0 0 12px rgba(52, 211, 153, 0.1);
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
 }
 
 .jh-score-med {
     background: rgba(251, 191, 36, 0.12);
     color: #fbbf24;
-    border: 1px solid rgba(251, 191, 36, 0.2);
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
 }
 
 .jh-score-low {
     background: rgba(248, 113, 113, 0.12);
     color: #f87171;
-    border: 1px solid rgba(248, 113, 113, 0.2);
+    border: 1px solid rgba(248, 113, 113, 0.3);
 }
 
 .jh-score-icon {
-    font-size: 11px;
+    font-size: 10px;
 }
 
-/* ====== Toast Notification ====== */
+/* ====== Toast ====== */
 .jh-toast {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 20px;
-    background: rgba(10, 10, 22, 0.9);
-    color: #f0f0f8;
-    border-radius: 14px;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.08);
-    z-index: 999999;
-    transform: translateY(100px) scale(0.95);
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(24px) saturate(1.4);
-    -webkit-backdrop-filter: blur(24px) saturate(1.4);
-}
-
-.jh-toast::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    border-radius: 14px 0 0 14px;
-    background: linear-gradient(180deg, #6366f1, #a855f7);
-}
-
-.jh-toast-show {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-}
-
-.jh-toast-success::before {
-    background: linear-gradient(180deg, #34d399, #059669);
-}
-
-.jh-toast-error::before {
-    background: linear-gradient(180deg, #f87171, #dc2626);
-}
-
-.jh-toast-warning::before {
-    background: linear-gradient(180deg, #fbbf24, #f59e0b);
-}
-
-.jh-toast-icon {
-    font-size: 16px;
-}
-
-/* ====== LinkedIn Time Filter Banner ====== */
-.jh-time-banner {
-    background: rgba(10, 10, 22, 0.85);
-    border: 1px solid rgba(99, 102, 241, 0.15);
-    border-radius: 14px;
-    padding: 10px 16px;
-    margin: 8px 0;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 0 40px rgba(99, 102, 241, 0.05);
-    z-index: 9999;
-    position: relative;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-}
-
-.jh-banner-content {
+    bottom: 20px;
+    right: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-wrap: wrap;
+    padding: 10px 16px;
+    background: #111;
+    color: #e8e8e8;
+    border: 1px solid #333;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    z-index: 99999;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s ease;
 }
 
-.jh-banner-icon {
-    font-size: 13px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #818cf8, #a855f7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    white-space: nowrap;
+.jh-toast-show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.jh-toast-success {
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.jh-toast-error {
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+.jh-toast-icon {
+    font-size: 14px;
+}
+
+/* ====== LinkedIn Banner ====== */
+.jh-linkedin-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 6px;
+    margin: 6px 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .jh-banner-text {
     font-size: 12px;
-    color: #a0a0c0;
+    color: #e8e8e8;
 }
 
-.jh-banner-btn {
-    padding: 5px 14px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    color: #f0f0f8;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: inherit;
-}
-
-.jh-banner-btn:hover {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.4);
-    transform: translateY(-1px);
-}
-
-.jh-banner-btn-active {
-    background: linear-gradient(135deg, #6366f1, #a855f7);
-    border-color: transparent;
-    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
-}
-
-.jh-banner-close {
-    position: absolute;
-    top: 6px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: #5c5c78;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 2px;
-    transition: all 0.2s;
-}
-
-.jh-banner-close:hover {
-    color: #f87171;
-    transform: scale(1.2);
+.jh-banner-score {
+    font-size: 13px;
+    font-weight: 700;
 }
