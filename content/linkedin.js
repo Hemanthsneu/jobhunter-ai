@@ -77,14 +77,16 @@
             const container = document.createElement('div');
             container.className = 'jh-card-actions';
 
-            JobHunterContent.injectButton(container, '🎯 Analyze', async () => {
+            JobHunterContent.injectButton(container, 'Analyze', async () => {
+                if (!chrome.runtime?.id) {
+                    JobHunterContent.showToast('Extension was updated. Please refresh this page.', 'error');
+                    return;
+                }
                 const jobData = extractLinkedInJobData(card);
                 if (jobData) {
                     JobHunterContent.showToast('Analyzing job with AI...', 'info');
                     await JobHunterContent.storeJobForAnalysis(jobData);
-
-                    // Open sidepanel
-                    chrome.runtime.sendMessage({
+                    await JobHunterContent.sendMessage({
                         type: 'ANALYZE_JOB',
                         job: jobData
                     });
@@ -108,19 +110,27 @@
         const container = document.createElement('div');
         container.className = 'jh-detail-actions';
 
-        JobHunterContent.injectButton(container, '🎯 Analyze & Tailor Resume', async () => {
+        JobHunterContent.injectButton(container, 'Analyze & Tailor Resume', async () => {
+            if (!chrome.runtime?.id) {
+                JobHunterContent.showToast('Extension was updated. Please refresh this page.', 'error');
+                return;
+            }
             const jobData = extractLinkedInJobDetailData();
             if (jobData) {
                 JobHunterContent.showToast('Analyzing job and tailoring resume...', 'info');
                 await JobHunterContent.storeJobForAnalysis(jobData);
-                chrome.runtime.sendMessage({ type: 'ANALYZE_JOB', job: jobData });
+                await JobHunterContent.sendMessage({ type: 'ANALYZE_JOB', job: jobData });
             }
         });
 
-        JobHunterContent.injectButton(container, '💾 Save to Tracker', async () => {
+        JobHunterContent.injectButton(container, 'Save to Tracker', async () => {
+            if (!chrome.runtime?.id) {
+                JobHunterContent.showToast('Extension was updated. Please refresh this page.', 'error');
+                return;
+            }
             const jobData = extractLinkedInJobDetailData();
             if (jobData) {
-                chrome.runtime.sendMessage({
+                await JobHunterContent.sendMessage({
                     type: 'SAVE_JOB',
                     job: { ...jobData, source: 'linkedin', status: 'saved', savedAt: new Date().toISOString() }
                 });
