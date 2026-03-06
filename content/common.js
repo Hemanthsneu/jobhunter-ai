@@ -65,15 +65,31 @@ const JobHunterContent = {
     // Send message to background script
     async sendMessage(msg) {
         return new Promise((resolve) => {
-            chrome.runtime.sendMessage(msg, (response) => {
-                resolve(response);
-            });
+            try {
+                if (!chrome.runtime?.id) { resolve(null); return; }
+                chrome.runtime.sendMessage(msg, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.warn('JobHunter AI: extension context changed, please refresh the page.');
+                        resolve(null);
+                        return;
+                    }
+                    resolve(response);
+                });
+            } catch (e) {
+                console.warn('JobHunter AI: extension was reloaded. Refresh this page to reconnect.');
+                resolve(null);
+            }
         });
     },
 
     // Store job data for analysis
     async storeJobForAnalysis(jobData) {
-        await chrome.storage.local.set({ pendingJobAnalysis: jobData });
+        try {
+            if (!chrome.runtime?.id) return;
+            await chrome.storage.local.set({ pendingJobAnalysis: jobData });
+        } catch (e) {
+            console.warn('JobHunter AI: extension was reloaded. Refresh this page to reconnect.');
+        }
     },
 
     // Check if element already has our injection
