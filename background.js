@@ -234,10 +234,12 @@ chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) =
 
 // ====== Context Menu ======
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({
-        id: 'analyzeJob',
-        title: 'Analyze with JobHunter AI',
-        contexts: ['selection', 'page']
+    chrome.contextMenus.removeAll(() => {
+        chrome.contextMenus.create({
+            id: 'analyzeJob',
+            title: 'Analyze with JobHunter AI',
+            contexts: ['selection', 'page']
+        });
     });
 });
 
