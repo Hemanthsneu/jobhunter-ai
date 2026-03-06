@@ -257,8 +257,27 @@
     document.getElementById('btn-copy-tailored').addEventListener('click', () => {
         if (currentTailoredResume) {
             navigator.clipboard.writeText(currentTailoredResume);
-            document.getElementById('btn-copy-tailored').textContent = '✅ Copied!';
-            setTimeout(() => document.getElementById('btn-copy-tailored').textContent = '📋 Copy', 2000);
+            document.getElementById('btn-copy-tailored').textContent = 'Copied!';
+            setTimeout(() => document.getElementById('btn-copy-tailored').textContent = 'Copy', 2000);
+        }
+    });
+
+    // Download tailored resume as HTML file
+    document.getElementById('btn-download-tailored').addEventListener('click', () => {
+        if (currentTailoredResume) {
+            const html = ResumeTemplates.generateHTML(currentTailoredResume, currentTemplate);
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const jobTitle = (currentJob?.title || 'Resume').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40);
+            a.download = `Tailored_Resume_${jobTitle}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            document.getElementById('btn-download-tailored').textContent = 'Downloaded!';
+            setTimeout(() => document.getElementById('btn-download-tailored').textContent = 'Download', 2000);
         }
     });
 
@@ -266,7 +285,7 @@
     document.getElementById('btn-preview-tailored').addEventListener('click', () => {
         if (currentTailoredResume) {
             const html = ResumeTemplates.generateHTML(currentTailoredResume, currentTemplate);
-            const blob = new Blob([html], { type: 'text/html' });
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             window.open(url, '_blank');
         }
