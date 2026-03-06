@@ -122,6 +122,19 @@
 
         chrome.runtime?.sendMessage({ type: 'SETTINGS_UPDATED', settings: newSettings }, () => { if (chrome.runtime.lastError) { /* suppress */ } });
 
+        // Sync profile to Supabase
+        if (typeof CloudSync !== 'undefined') {
+            CloudSync.syncProfile({
+                firstName: newSettings.profileName?.split(' ')[0] || '',
+                lastName: newSettings.profileName?.split(' ').slice(1).join(' ') || '',
+                email: newSettings.profileEmail,
+                phone: newSettings.profilePhone,
+                linkedin: newSettings.profileLinkedin,
+                github: newSettings.profileGithub,
+                needsSponsorship: newSettings.needsSponsorship
+            }).catch(e => console.warn('Profile sync:', e.message));
+        }
+
         const feedback = document.getElementById('save-feedback');
         feedback.style.display = 'block';
         setTimeout(() => feedback.style.display = 'none', 2000);
