@@ -841,6 +841,33 @@
     document.querySelector('[data-tab="stats"]')?.addEventListener('click', renderStats);
     document.getElementById('btn-refresh-stats')?.addEventListener('click', renderStats);
 
+    // ====== Data Management ======
+    document.getElementById('btn-export-data')?.addEventListener('click', async () => {
+        try {
+            await StorageManager.exportAllData();
+        } catch (e) { console.error('Export failed:', e); }
+    });
+
+    document.getElementById('btn-import-data')?.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const result = await StorageManager.importData(text);
+            alert(`Imported ${result.jobs} jobs and ${result.applications} applications.`);
+        } catch (err) { alert('Import failed: ' + err.message); }
+    });
+
+    document.getElementById('btn-delete-all')?.addEventListener('click', async () => {
+        if (confirm('Delete ALL data? This cannot be undone. Export a backup first!')) {
+            if (confirm('Are you absolutely sure? This will delete all jobs, applications, resumes, and settings.')) {
+                await StorageManager.deleteAllData();
+                alert('All data deleted. Extension will reload.');
+                window.location.reload();
+            }
+        }
+    });
+
     // Init onboarding check
     checkOnboarding();
 
