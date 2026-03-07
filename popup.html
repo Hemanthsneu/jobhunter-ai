@@ -69,6 +69,14 @@
           </svg></span>
         <span>Tracker</span>
       </button>
+      <button class="tab-btn" data-tab="stats">
+        <span class="icon"><svg viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
+          </svg></span>
+        <span>Stats</span>
+      </button>
       <button class="tab-btn" data-tab="resume">
         <span class="icon"><svg viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -251,6 +259,64 @@
           <p>No tracked applications yet. Click <strong>"Save"</strong> or <strong>"Applied"</strong> on any job to
             start tracking.</p>
         </div>
+      </div>
+    </div>
+
+    <!-- STATS TAB -->
+    <div class="tab-content" id="tab-stats">
+      <div class="section-header">
+        <h2>Performance</h2>
+        <button class="btn btn-sm btn-ghost" id="btn-refresh-stats">
+          <span class="icon icon-sm"><svg viewBox="0 0 24 24">
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg></span>
+          Refresh
+        </button>
+      </div>
+
+      <!-- Key Metrics Row -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stats-metric">
+          <div class="stats-metric-value" id="metric-response">0%</div>
+          <div class="stats-metric-label">Response Rate</div>
+          <div class="stats-metric-compare" id="metric-response-vs">vs 8.5% avg</div>
+        </div>
+        <div class="stats-metric">
+          <div class="stats-metric-value" id="metric-applied">0</div>
+          <div class="stats-metric-label">Applied</div>
+          <div class="stats-metric-compare" id="metric-interviews">0 interviews</div>
+        </div>
+        <div class="stats-metric">
+          <div class="stats-metric-value" id="metric-offers">0</div>
+          <div class="stats-metric-label">Offers</div>
+          <div class="stats-metric-compare" id="metric-offer-rate">0% rate</div>
+        </div>
+        <div class="stats-metric">
+          <div class="stats-metric-value" id="metric-ghosted">0</div>
+          <div class="stats-metric-label">Ghosted</div>
+          <div class="stats-metric-compare" id="metric-rejected">0 rejected</div>
+        </div>
+      </div>
+
+      <!-- Weekly Trend -->
+      <div class="card" style="margin:8px 14px;">
+        <div class="card-header">Weekly Activity</div>
+        <div class="stats-chart" id="stats-weekly-chart">
+          <div class="stats-bars" id="stats-bars"></div>
+        </div>
+      </div>
+
+      <!-- Source Breakdown -->
+      <div class="card" style="margin:8px 14px;">
+        <div class="card-header">Applications by Source</div>
+        <div class="stats-source-list" id="stats-sources"></div>
+      </div>
+
+      <!-- Top Companies -->
+      <div class="card" style="margin:8px 14px;">
+        <div class="card-header">Top Companies</div>
+        <div class="stats-company-list" id="stats-companies"></div>
       </div>
     </div>
 

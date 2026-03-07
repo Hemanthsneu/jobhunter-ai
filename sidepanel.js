@@ -262,42 +262,59 @@
         }
     });
 
-    // Download tailored resume as PDF (via browser print dialog)
-    document.getElementById('btn-download-tailored').addEventListener('click', () => {
+    // Download tailored resume as real PDF using html2pdf.js
+    document.getElementById('btn-download-tailored').addEventListener('click', async () => {
         if (currentTailoredResume) {
-            let html = ResumeTemplates.generateHTML(currentTailoredResume, currentTemplate);
-            // Inject print styles and auto-print script
-            const jobTitle = (currentJob?.title || 'Tailored_Resume').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_');
-            const printScript = `
-<style>
-  @media print {
-    body { margin: 0; padding: 0.4in 0.5in; }
-    @page { size: letter; margin: 0; }
-  }
-</style>
-<` + `script>
-  window.onload = function() {
-    document.title = '${jobTitle}';
-    // Show instruction banner
-    var banner = document.createElement('div');
-    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:10px;background:#111;color:#fff;text-align:center;font-family:sans-serif;font-size:13px;z-index:99999;border-bottom:1px solid #333';
-    banner.innerHTML = 'Press <b>Cmd+P</b> (Mac) or <b>Ctrl+P</b> (Win) → select <b>"Save as PDF"</b> as destination → Save';
-    document.body.prepend(banner);
-    // Auto-trigger print dialog after brief delay
-    setTimeout(function() { window.print(); }, 500);
-  };
-</` + `script>`;
-            html = html.replace('</head>', printScript + '\n</head>');
-            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            // Use chrome.tabs.create (works from sidepanel, unlike window.open)
-            if (chrome.tabs) {
-                chrome.tabs.create({ url: url });
-            } else {
-                window.open(url, '_blank');
+            const btn = document.getElementById('btn-download-tailored');
+            btn.textContent = 'Generating...';
+            btn.disabled = true;
+            try {
+                const html = ResumeTemplates.generateHTML(currentTailoredResume, currentTemplate);
+                const jobTitle = (currentJob?.title || 'Tailored_Resume').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_');
+
+                // Create a temporary container for html2pdf
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '-9999px';
+                container.style.top = '0';
+                container.style.width = '8.5in';
+
+                // Extract body content from the full HTML template
+                const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+
+                if (styleMatch) {
+                    const styleEl = document.createElement('style');
+                    styleEl.textContent = styleMatch[1];
+                    container.appendChild(styleEl);
+                }
+
+                const content = document.createElement('div');
+                content.innerHTML = bodyMatch ? bodyMatch[1] : html;
+                container.appendChild(content);
+                document.body.appendChild(container);
+
+                // Generate PDF
+                await html2pdf().set({
+                    margin: [0.4, 0.5, 0.4, 0.5],
+                    filename: `${jobTitle}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all'] }
+                }).from(container).save();
+
+                document.body.removeChild(container);
+                btn.textContent = 'Downloaded!';
+            } catch (err) {
+                console.error('PDF generation failed:', err);
+                btn.textContent = 'Error';
+                // Fallback to preview in new tab
+                const html = ResumeTemplates.generateHTML(currentTailoredResume, currentTemplate);
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+                if (chrome.tabs) chrome.tabs.create({ url: URL.createObjectURL(blob) });
             }
-            document.getElementById('btn-download-tailored').textContent = 'Opening...';
-            setTimeout(() => document.getElementById('btn-download-tailored').textContent = 'Download PDF', 2000);
+            setTimeout(() => { btn.textContent = 'Download PDF'; btn.disabled = false; }, 2000);
         }
     });
 

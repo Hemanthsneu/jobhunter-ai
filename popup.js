@@ -777,6 +777,70 @@
         return div.innerHTML;
     }
 
+    // ====== Stats Dashboard ======
+    async function renderStats() {
+        const apps = await StorageManager.getTrackerItems?.() || await StorageManager.getAllJobs?.() || [];
+        if (!apps.length) {
+            document.getElementById('stats-bars').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">No application data yet. Save and track jobs to see stats.</div>';
+            return;
+        }
+        const stats = await Analytics.computeStats(apps);
+
+        // Metric cards
+        document.getElementById('metric-response').textContent = stats.responseRate + '%';
+        const vsAvg = parseFloat(stats.vsAvgResponse);
+        const vsEl = document.getElementById('metric-response-vs');
+        vsEl.textContent = (vsAvg >= 0 ? '+' : '') + vsAvg + '% vs avg';
+        vsEl.className = 'stats-metric-compare ' + (vsAvg >= 0 ? 'positive' : 'negative');
+
+        document.getElementById('metric-applied').textContent = stats.applied;
+        document.getElementById('metric-interviews').textContent = stats.interviews + ' interviews';
+        document.getElementById('metric-offers').textContent = stats.offers;
+        document.getElementById('metric-offer-rate').textContent = stats.offerRate + '% rate';
+        document.getElementById('metric-ghosted').textContent = stats.ghosted;
+        document.getElementById('metric-rejected').textContent = stats.rejected + ' rejected';
+
+        // Weekly trend bars
+        const weeklyData = stats.weeklyData || [];
+        const maxCount = Math.max(...weeklyData.map(w => w.count), 1);
+        document.getElementById('stats-bars').innerHTML = weeklyData.map(w => `
+            <div class="stats-bar-wrapper">
+                <div class="stats-bar-count">${w.count}</div>
+                <div class="stats-bar" style="height:${Math.max(4, (w.count / maxCount) * 60)}px"></div>
+                <div class="stats-bar-label">${w.start}</div>
+            </div>
+        `).join('');
+
+        // Source breakdown
+        const sources = stats.sourceMix || {};
+        const totalSources = Object.values(sources).reduce((a, b) => a + b, 0) || 1;
+        document.getElementById('stats-sources').innerHTML = Object.entries(sources)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([source, count]) => `
+                <div class="stats-source-item">
+                    <div class="stats-source-name">${escapeHTML(source)}</div>
+                    <div class="stats-progress-bar"><div class="stats-progress-fill" style="width:${(count / totalSources) * 100}%"></div></div>
+                    <div class="stats-source-count">${count}</div>
+                </div>
+            `).join('') || '<div style="color:var(--text-muted);font-size:11px;">No source data</div>';
+
+        // Top companies
+        const companies = stats.topCompanies || [];
+        const maxCompanyCount = companies.length ? companies[0].count : 1;
+        document.getElementById('stats-companies').innerHTML = companies.map(c => `
+            <div class="stats-company-item">
+                <div class="stats-company-name">${escapeHTML(c.company)}</div>
+                <div class="stats-progress-bar"><div class="stats-progress-fill" style="width:${(c.count / maxCompanyCount) * 100}%"></div></div>
+                <div class="stats-company-count">${c.count}</div>
+            </div>
+        `).join('') || '<div style="color:var(--text-muted);font-size:11px;">No company data</div>';
+    }
+
+    // Load stats when Stats tab is clicked
+    document.querySelector('[data-tab="stats"]')?.addEventListener('click', renderStats);
+    document.getElementById('btn-refresh-stats')?.addEventListener('click', renderStats);
+
     // Init onboarding check
     checkOnboarding();
 
