@@ -127,6 +127,32 @@
             currentTailoredResume = tailored;
             document.getElementById('tailored-content').textContent = tailored;
 
+            // Re-score tailored resume to show improvement
+            try {
+                const newAts = await ClaudeAI.calculateATSScore(
+                    analysisSettings.anthropicKey,
+                    tailored,
+                    job.description || job.title
+                );
+                if (newAts && newAts.overallScore) {
+                    const oldScore = atsResult.overallScore || 0;
+                    const newScore = Math.min(100, newAts.overallScore);
+                    const delta = newScore - oldScore;
+                    const deltaColor = delta > 0 ? 'var(--success)' : delta < 0 ? 'var(--danger)' : 'var(--text-muted)';
+                    const deltaSign = delta > 0 ? '+' : '';
+                    const rescoreEl = document.createElement('div');
+                    rescoreEl.style.cssText = 'padding:10px 14px;border-top:1px solid var(--border);font-size:12px;';
+                    rescoreEl.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="color:var(--text-secondary);">Tailored Resume ATS Score</span>
+                            <span style="font-size:18px;font-weight:700;color:white;">${newScore}%
+                                <span style="font-size:12px;color:${deltaColor};font-weight:600;">(${deltaSign}${delta}%)</span>
+                            </span>
+                        </div>`;
+                    document.querySelector('.tailored-section')?.appendChild(rescoreEl);
+                }
+            } catch (e) { console.log('Re-score skipped:', e.message); }
+
         } catch (err) {
             console.error('Analysis failed:', err);
             document.getElementById('score-section').innerHTML = `
@@ -262,7 +288,7 @@
         }
     });
 
-    // Download tailored resume as real PDF using html2pdf.js
+    // Download tailored resume as PDF using iframe for style isolation
     document.getElementById('btn-download-tailored').addEventListener('click', async () => {
         if (currentTailoredResume) {
             const btn = document.getElementById('btn-download-tailored');
@@ -272,29 +298,20 @@
                 const html = ResumeTemplates.generateHTML(currentTailoredResume, currentTemplate);
                 const jobTitle = (currentJob?.title || 'Tailored_Resume').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_');
 
-                // Create a temporary container for html2pdf
-                const container = document.createElement('div');
-                container.style.position = 'absolute';
-                container.style.left = '-9999px';
-                container.style.top = '0';
-                container.style.width = '8.5in';
+                // Use iframe for complete style isolation (sidepanel dark bg won't bleed in)
+                const iframe = document.createElement('iframe');
+                iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:8.5in;height:11in;border:none;';
+                document.body.appendChild(iframe);
 
-                // Extract body content from the full HTML template
-                const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-                const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(html);
+                iframeDoc.close();
 
-                if (styleMatch) {
-                    const styleEl = document.createElement('style');
-                    styleEl.textContent = styleMatch[1];
-                    container.appendChild(styleEl);
-                }
+                // Wait for iframe content to render
+                await new Promise(r => setTimeout(r, 600));
 
-                const content = document.createElement('div');
-                content.innerHTML = bodyMatch ? bodyMatch[1] : html;
-                container.appendChild(content);
-                document.body.appendChild(container);
-
-                // Generate PDF
+                // Generate PDF from iframe body (white bg, black text, proper fonts)
                 await html2pdf().set({
                     margin: [0.4, 0.5, 0.4, 0.5],
                     filename: `${jobTitle}.pdf`,
@@ -302,19 +319,19 @@
                     html2canvas: { scale: 2, useCORS: true, letterRendering: true },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
                     pagebreak: { mode: ['avoid-all'] }
-                }).from(container).save();
+                }).from(iframeDoc.body).save();
 
-                document.body.removeChild(container);
+                document.body.removeChild(iframe);
                 btn.textContent = 'Downloaded!';
             } catch (err) {
                 console.error('PDF generation failed:', err);
                 btn.textContent = 'Error';
-                // Fallback to preview in new tab
-                const html = ResumeTemplates.generateHTML(currentTailoredResume, currentTemplate);
-                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+                // Fallback: open in new tab for manual Cmd+P
+                const htmlFallback = ResumeTemplates.generateHTML(currentTailoredResume, currentTemplate);
+                const blob = new Blob([htmlFallback], { type: 'text/html;charset=utf-8' });
                 if (chrome.tabs) chrome.tabs.create({ url: URL.createObjectURL(blob) });
             }
-            setTimeout(() => { btn.textContent = 'Download PDF'; btn.disabled = false; }, 2000);
+            setTimeout(() => { btn.textContent = 'Download PDF'; btn.disabled = false; }, 2500);
         }
     });
 
@@ -328,64 +345,65 @@
         }
     });
 
-    // Generate cover letter
-    document.getElementById('btn-gen-cover').addEventListener('click', async () => {
-        if (!currentJob || !settings.anthropicKey) return;
 
-        const btn = document.getElementById('btn-gen-cover');
-        const content = document.getElementById('cover-content');
-        btn.textContent = '⏳...';
-        content.style.display = 'block';
-        content.innerHTML = '<div class="loading-shimmer" style="width:100%; height:80px;"></div>';
+// Generate cover letter
+document.getElementById('btn-gen-cover').addEventListener('click', async () => {
+    if (!currentJob || !settings.anthropicKey) return;
 
-        try {
-            const savedResume = await StorageManager.getResume('primary');
-            const letter = await ClaudeAI.generateCoverLetter(
-                settings.anthropicKey,
-                savedResume?.text || '',
-                currentJob.description || currentJob.title,
-                currentJob.company || ''
-            );
-            content.textContent = letter;
-        } catch (e) {
-            content.textContent = 'Error: ' + e.message;
-        }
+    const btn = document.getElementById('btn-gen-cover');
+    const content = document.getElementById('cover-content');
+    btn.textContent = '⏳...';
+    content.style.display = 'block';
+    content.innerHTML = '<div class="loading-shimmer" style="width:100%; height:80px;"></div>';
 
-        btn.textContent = 'Generate';
-    });
+    try {
+        const savedResume = await StorageManager.getResume('primary');
+        const letter = await ClaudeAI.generateCoverLetter(
+            settings.anthropicKey,
+            savedResume?.text || '',
+            currentJob.description || currentJob.title,
+            currentJob.company || ''
+        );
+        content.textContent = letter;
+    } catch (e) {
+        content.textContent = 'Error: ' + e.message;
+    }
 
-    // Generate Interview Prep
-    document.getElementById('btn-gen-interview').addEventListener('click', async () => {
-        if (!currentJob || !settings.anthropicKey) return;
+    btn.textContent = 'Generate';
+});
 
-        const btn = document.getElementById('btn-gen-interview');
-        const content = document.getElementById('interview-content');
-        btn.textContent = 'Generating...';
-        content.style.display = 'block';
-        content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:200px;"></div>';
+// Generate Interview Prep
+document.getElementById('btn-gen-interview').addEventListener('click', async () => {
+    if (!currentJob || !settings.anthropicKey) return;
 
-        try {
-            const savedResume = await StorageManager.getResume('primary');
-            const questions = await ClaudeAI.generateInterviewPrep(
-                settings.anthropicKey,
-                currentJob.description || currentJob.title,
-                savedResume?.text || '',
-                currentJob.title || ''
-            );
+    const btn = document.getElementById('btn-gen-interview');
+    const content = document.getElementById('interview-content');
+    btn.textContent = 'Generating...';
+    content.style.display = 'block';
+    content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:200px;"></div>';
 
-            if (Array.isArray(questions)) {
-                const categories = {};
-                questions.forEach(q => {
-                    if (!categories[q.category]) categories[q.category] = [];
-                    categories[q.category].push(q);
-                });
+    try {
+        const savedResume = await StorageManager.getResume('primary');
+        const questions = await ClaudeAI.generateInterviewPrep(
+            settings.anthropicKey,
+            currentJob.description || currentJob.title,
+            savedResume?.text || '',
+            currentJob.title || ''
+        );
 
-                let html = '';
-                for (const [cat, qs] of Object.entries(categories)) {
-                    html += `<div class="interview-category">
+        if (Array.isArray(questions)) {
+            const categories = {};
+            questions.forEach(q => {
+                if (!categories[q.category]) categories[q.category] = [];
+                categories[q.category].push(q);
+            });
+
+            let html = '';
+            for (const [cat, qs] of Object.entries(categories)) {
+                html += `<div class="interview-category">
                         <h4 style="margin:12px 0 8px;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">${cat}</h4>`;
-                    qs.forEach((q, i) => {
-                        html += `<details class="interview-card" style="margin-bottom:8px;background:var(--bg-elevated);border-radius:8px;padding:0;">
+                qs.forEach((q, i) => {
+                    html += `<details class="interview-card" style="margin-bottom:8px;background:var(--bg-elevated);border-radius:8px;padding:0;">
                             <summary style="padding:10px 12px;cursor:pointer;font-size:12px;font-weight:500;list-style:none;display:flex;align-items:center;gap:8px;">
                                 <span style="background:${q.difficulty === 'Hard' ? 'var(--error)' : q.difficulty === 'Medium' ? 'var(--warning)' : 'var(--success)'};color:white;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;">${q.difficulty}</span>
                                 ${q.question}
@@ -396,71 +414,71 @@
                                 <p><strong style="color:var(--error);">Red flags:</strong> ${q.redFlags}</p>
                             </div>
                         </details>`;
-                    });
-                    html += '</div>';
-                }
-                content.innerHTML = html;
-            } else {
-                content.textContent = 'Could not generate questions. Please try again.';
+                });
+                html += '</div>';
             }
-        } catch (e) {
-            content.textContent = 'Error: ' + e.message;
+            content.innerHTML = html;
+        } else {
+            content.textContent = 'Could not generate questions. Please try again.';
         }
-        btn.textContent = 'Generate Questions';
-    });
+    } catch (e) {
+        content.textContent = 'Error: ' + e.message;
+    }
+    btn.textContent = 'Generate Questions';
+});
 
-    // Follow-Up Emails
-    const followUpHandler = async (stage) => {
-        if (!currentJob || !settings.anthropicKey) return;
+// Follow-Up Emails
+const followUpHandler = async (stage) => {
+    if (!currentJob || !settings.anthropicKey) return;
 
-        const content = document.getElementById('followup-content');
-        content.style.display = 'block';
-        content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:80px;"></div>';
+    const content = document.getElementById('followup-content');
+    content.style.display = 'block';
+    content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:80px;"></div>';
 
-        try {
-            const email = await ClaudeAI.generateFollowUp(
-                settings.anthropicKey,
-                { company: currentJob.company, title: currentJob.title, resumeSummary: '' },
-                stage
-            );
-            content.innerHTML = `
+    try {
+        const email = await ClaudeAI.generateFollowUp(
+            settings.anthropicKey,
+            { company: currentJob.company, title: currentJob.title, resumeSummary: '' },
+            stage
+        );
+        content.innerHTML = `
                 <div style="white-space:pre-wrap;font-size:12px;line-height:1.6;padding:12px;background:var(--bg-elevated);border-radius:8px;">${email}</div>
                 <button class="panel-btn" id="btn-copy-email" style="margin-top:8px;">Copy to Clipboard</button>
             `;
-            document.getElementById('btn-copy-email').addEventListener('click', () => {
-                navigator.clipboard.writeText(email);
-                document.getElementById('btn-copy-email').textContent = 'Copied!';
-                setTimeout(() => document.getElementById('btn-copy-email').textContent = 'Copy to Clipboard', 2000);
-            });
-        } catch (e) {
-            content.textContent = 'Error: ' + e.message;
-        }
-    };
-    document.getElementById('btn-followup-applied').addEventListener('click', () => followUpHandler('applied'));
-    document.getElementById('btn-followup-interview').addEventListener('click', () => followUpHandler('interview'));
+        document.getElementById('btn-copy-email').addEventListener('click', () => {
+            navigator.clipboard.writeText(email);
+            document.getElementById('btn-copy-email').textContent = 'Copied!';
+            setTimeout(() => document.getElementById('btn-copy-email').textContent = 'Copy to Clipboard', 2000);
+        });
+    } catch (e) {
+        content.textContent = 'Error: ' + e.message;
+    }
+};
+document.getElementById('btn-followup-applied').addEventListener('click', () => followUpHandler('applied'));
+document.getElementById('btn-followup-interview').addEventListener('click', () => followUpHandler('interview'));
 
-    // Save job
-    document.getElementById('btn-save-job').addEventListener('click', async () => {
-        if (currentJob) {
-            await StorageManager.saveApplication({
-                ...currentJob,
-                status: 'saved',
-                savedAt: new Date().toISOString()
-            });
-            document.getElementById('btn-save-job').textContent = '✅ Saved!';
-        }
-    });
+// Save job
+document.getElementById('btn-save-job').addEventListener('click', async () => {
+    if (currentJob) {
+        await StorageManager.saveApplication({
+            ...currentJob,
+            status: 'saved',
+            savedAt: new Date().toISOString()
+        });
+        document.getElementById('btn-save-job').textContent = '✅ Saved!';
+    }
+});
 
-    // Mark applied
-    document.getElementById('btn-mark-applied').addEventListener('click', async () => {
-        if (currentJob) {
-            await StorageManager.saveApplication({
-                ...currentJob,
-                status: 'applied',
-                appliedAt: new Date().toISOString()
-            });
-            document.getElementById('btn-mark-applied').textContent = '✅ Applied!';
-        }
-    });
+// Mark applied
+document.getElementById('btn-mark-applied').addEventListener('click', async () => {
+    if (currentJob) {
+        await StorageManager.saveApplication({
+            ...currentJob,
+            status: 'applied',
+            appliedAt: new Date().toISOString()
+        });
+        document.getElementById('btn-mark-applied').textContent = '✅ Applied!';
+    }
+});
 
-})();
+}) ();
