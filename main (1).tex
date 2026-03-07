@@ -1,0 +1,265 @@
+%-------------------------
+% Resume in LaTeX (expanded + compile-safe)
+% Template: Jake Gutierrez (MIT) — https://github.com/sb2nov/resume
+%------------------------
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{lmodern}
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\setlength{\multicolsep}{-3.0pt}
+\setlength{\columnsep}{-1pt}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\setlength{\footskip}{10pt} % avoid fancyhdr warning
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.75in}
+\addtolength{\evensidemargin}{-0.75in}
+\addtolength{\textwidth}{1.5in}
+\addtolength{\topmargin}{-.8in}
+\addtolength{\textheight}{1.6in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Section formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Machine readable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{\item\small{#1 \vspace{-2pt}}}
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textbf{\small #2} \\
+      \textit{\small #3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+\newcommand{\resumeProjectHeading}[2]{
+  \item
+  \begin{tabular*}{1.001\textwidth}{l@{\extracolsep{\fill}}r}
+    \small #1 & \textbf{\small #2}\\
+  \end{tabular*}\vspace{-7pt}
+}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]\setlength\itemsep{4pt}}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=0.15in]\setlength\itemsep{2pt}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    {\Huge \scshape Hemanth Saragadam} \\ \vspace{2pt}
+    \small
+    \raisebox{-0.1\height}\faPhone\ +1 5103944615 \  
+    \href{mailto:hemanthdev31@gmail.com}{\raisebox{-0.2\height}\faEnvelope\ \underline{hemanthdev31@gmail.com}} \ 
+     \href{https://www.linkedin.com/in/hemanths31/}{\raisebox{-0.2\height}\faLinkedin\ \underline{linkedin.com/in/hemanths31/}}
+    \vspace{-10pt}
+\end{center}
+
+
+%-----------SUMMARY-----------
+\section{Summary}
+\resumeSubHeadingListStart
+\resumeItem{Senior Software Engineer with 5 plus years building full stack and backend platforms end to end, including API design, distributed systems, event driven pipelines, cloud infrastructure, CI CD, and on call ownership. Strong in Java, Spring Boot, Node.js, React, AWS, Kubernetes, and observability using SLIs, SLOs, and OpenTelemetry. Deliver scalable systems, improve latency and reliability, and ship iterative releases with measurable impact.}
+\resumeSubHeadingListEnd
+
+
+%-----------TECHNICAL SKILLS-----------
+
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+\small{\item{
+\textbf{Languages:} Java, TypeScript, JavaScript, Python, C\#, SQL \\
+\textbf{Backend:} Spring Boot, Node.js, Express, REST APIs, OpenAPI, gRPC, WebSockets \\
+\textbf{Frontend:} React, Next.js, Angular, HTML, CSS \\
+\textbf{Architecture:} Microservices, distributed systems, event-driven architecture, domain-driven design, system design, API versioning \\
+\textbf{Messaging and Data Pipelines:} Kafka, at-least-once processing, idempotency, outbox pattern, retries with backoff, dead-letter queues \\
+\textbf{Datastores:} PostgreSQL, MySQL, Redis, DynamoDB, MongoDB \\
+\textbf{Cloud and DevOps:} AWS (EKS, Lambda, SNS, S3, RDS), Docker, Kubernetes, Terraform, Pulumi, CI CD, Jenkins, GitHub Actions \\
+\textbf{Observability and Reliability:} OpenTelemetry, structured logging, metrics, tracing, dashboards, alerting, SLIs, SLOs, incident response \\
+\textbf{Security:} OAuth2, OpenID Connect, JWT, RBAC, secrets management \\
+\textbf{Testing:} JUnit, Mockito, Jest, Cypress, Selenium, integration testing, contract testing
+}}
+\end{itemize}
+
+
+%-----------EXPERIENCE-----------
+% =========================
+% DEMO RESUME ONLY
+% FICTIONAL METRICS AND IMPACT
+% DO NOT USE FOR REAL JOB APPLICATIONS
+% =========================
+
+\section{Experience}
+\resumeSubHeadingListStart
+
+  \resumeSubheading
+    {Labs196 Innovations LLC}{Sep. 2024 -- Present}
+    {Senior Software Engineer}{Sugar Land, Texas}
+    \resumeItemListStart
+      \resumeItem{Led architecture and delivery of a microservices platform, defining bounded contexts, API contracts, and data ownership; improved feature delivery speed by 35\% and reduced cross-team dependencies by 40\%; Java, Spring Boot, Node.js, PostgreSQL.}
+      \resumeItem{Designed event-driven workflows with idempotent consumers, retries with exponential backoff, and dead-letter handling; reduced production incidents by 45\% and improved recovery time by 38\%; Kafka, Redis.}
+      \resumeItem{Implemented transactional outbox publishing for reliable event delivery; eliminated duplicate side effects and improved data consistency across services by 90\%; PostgreSQL, Kafka.}
+      \resumeItem{Optimized hot-path APIs with query plan tuning, indexing, and selective caching; reduced p95 latency by 42\% and lowered database CPU by 28\%; PostgreSQL, Redis, REST APIs.}
+      \resumeItem{Built production observability with traces, metrics, logs, and correlation IDs; reduced time-to-root-cause by 55\% and improved alert precision by 30\%; OpenTelemetry, dashboards, alerting.}
+      \resumeItem{Strengthened platform security with RBAC, audit trails, and secrets management; reduced security findings by 60\% and enabled compliant administrative operations; JWT, RBAC, AWS KMS, AWS Parameter Store.}
+      \resumeItem{Automated deployments and infrastructure with CI CD and IaC; reduced deployment time by 70\% and lowered rollback rate by 25\%; Terraform, Pulumi, Kubernetes, Amazon EKS, Jenkins.}
+      \resumeItem{Established quality gates with integration tests and contract testing; reduced regression escapes by 35\% and stabilized cross-service compatibility; JUnit, Mockito, contract testing.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {KYC Hub}{Jan. 2022 -- Jun. 2022}
+    {Software Engineer}{Remote}
+    \resumeItemListStart
+      \resumeItem{Built full-stack KYC and KYB verification workflows with reviewer tooling and deterministic state transitions; increased case throughput by 30\% and reduced manual steps by 25\%; Spring Boot, Angular, REST APIs.}
+      \resumeItem{Integrated 6+ identity and risk providers using adapter services with standardized mapping and error taxonomy; improved completion rate by 11\% and reduced provider-related failures by 33\%; Java, REST APIs, structured logging.}
+      \resumeItem{Implemented multi-tenant authentication, authorization, and auditing with PII-safe logging; passed compliance review with 50\% fewer findings; OAuth2, OpenID Connect, JWT, RBAC.}
+      \resumeItem{Reduced endpoint latency through query optimization, pagination, and caching; improved p95 response time by 29\% under peak traffic; SQL, Redis.}
+      \resumeItem{Introduced CI gates and expanded automated tests; reduced regressions by 28\% and improved release cadence from weekly to 3x per week; JUnit, Mockito, Cypress, Jenkins.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {DocsTime}{Jan. 2020 -- Oct. 2021}
+    {Full-Stack Engineer}{Remote}
+    \resumeItemListStart
+      \resumeItem{Delivered end-to-end product features across frontend and backend; reduced customer request turnaround time from 2 weeks to 4 days by tightening delivery loops; Angular, Node.js, REST APIs.}
+      \resumeItem{Modernized the application into a progressive web experience with offline-first caching and notifications; improved retention by 12\% and reduced support tickets by 22\%; Angular, service workers.}
+      \resumeItem{Built CI CD pipelines with automated tests, versioned artifacts, and staged deployments; reduced release cycle time by 48\% and lowered rollback frequency by 27\%; Jenkins, Git, automated testing.}
+      \resumeItem{Optimized APIs by profiling slow endpoints, tuning SQL queries and indexes, and enforcing pagination; reduced p95 latency by 37\% and reduced timeouts by 31\%; SQL, relational databases.}
+      \resumeItem{Introduced caching for high-frequency reads and session-heavy flows; reduced database load by 34\% and improved throughput by 21\%; Redis, caching patterns.}
+      \resumeItem{Added structured logging with correlation IDs and standardized error taxonomy; reduced debugging time by 40\% and improved incident triage speed; structured logs, dashboards.}
+      \resumeItem{Expanded automated testing across unit and end-to-end suites; reduced regression escapes by 26\%; Jest, Cypress, integration testing.}
+      \resumeItem{Implemented analytics and referral tracking with serverless processing; reduced reporting latency from hours to minutes; AWS Lambda, event processing.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {Northeastern University}{Jan. 2023 -- May 2024}
+    {Full-Stack Developer (Part-time)}{Boston, Massachusetts}
+    \resumeItemListStart
+      \resumeItem{Built an assignment management system with role-based permissions, validation, and workflow automation; reduced administrative overhead by 30\% and improved submission correctness by 15\%; Node.js, Express, Sequelize, PostgreSQL.}
+      \resumeItem{Automated submission processing using serverless event notifications with idempotent handlers; reduced processing time from 6 minutes to 25 seconds and improved reliability by 35\%; AWS Lambda, SNS, S3.}
+      \resumeItem{Added observability with structured logs, metrics, dashboards, and alerts; reduced time-to-detect issues by 40\%; Winston, StatsD, dashboards.}
+      \resumeItem{Provisioned environments and infrastructure using IaC and standardized setup; reduced onboarding time by 45\%; Pulumi, Docker, CI checks.}
+      \resumeItem{Improved quality with automated tests and CI validation; reduced regressions by 20\%; Jest, integration testing, CI CD.}
+    \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+% =========================
+% DEMO RESUME ONLY
+% FICTIONAL PROJECTS AND HACKATHON RESULTS
+% DO NOT USE FOR REAL JOB APPLICATIONS
+% =========================
+
+\section{Projects and Hackathons}
+\resumeSubHeadingListStart
+
+\resumeItem{\textbf{Projects}}
+\vspace{-2pt}
+
+\resumeProjectHeading{AegisGate: Multi Tenant API Gateway and Policy Engine }{ Jan. 2025}
+\resumeItemListStart
+  \resumeItem{Built a multi-tenant API gateway with authentication hooks, per-route policies, and role-aware routing; sustained 12{,}000 requests per second in load tests while maintaining p95 latency under 45 ms; Node.js, Redis, OpenAPI.}
+  \resumeItem{Implemented sliding-window rate limiting, burst control, and request fingerprinting with hot-key mitigation; reduced abuse traffic impact by 70\% and improved availability to 99.95\%; Redis, caching patterns.}
+  \resumeItem{Added contract tests and backward-compatible API versioning checks in CI; reduced breaking changes by 90\% and improved release safety; contract testing, CI CD.}
+  \resumeItem{Instrumented end-to-end tracing and metrics with service-level dashboards and burn-rate alerts; reduced MTTR by 50\%; OpenTelemetry, dashboards, alerting.}
+\resumeItemListEnd
+
+\resumeProjectHeading{PulseLedger: Event Driven Orders and Payments with Saga Orchestration }{Feb. 2024}
+\resumeItemListStart
+  \resumeItem{Designed a microservices system for orders and payments using saga orchestration and transactional outbox publishing; processed 1.2 million events per day with zero duplicate charges during replay tests; Kafka, PostgreSQL.}
+  \resumeItem{Implemented idempotent consumers, retries with exponential backoff, and dead-letter workflows with replay tooling; reduced failure handling time by 60\% and simplified recovery procedures; Kafka, DLQ patterns.}
+  \resumeItem{Built schema evolution strategy with compatibility gates, migration tooling, and consumer contract checks; enabled safe deployments with zero-downtime upgrades; schema versioning, CI validations.}
+\resumeItemListEnd
+
+\resumeProjectHeading{SignalForge: Full Stack Observability and SLO Platform }{Jan. 2024}
+\resumeItemListStart
+  \resumeItem{Built a unified telemetry pipeline collecting traces, metrics, and logs from services and clients with correlation IDs; increased signal quality and reduced alert noise by 35\%; OpenTelemetry, collectors.}
+  \resumeItem{Defined SLIs and SLOs for critical user journeys with error budgets and burn-rate alerts; improved incident detection time by 45\% and reduced false positives by 30\%; dashboards, alerting policies.}
+  \resumeItem{Load-tested and chaos-tested critical paths to validate timeouts, retries, and back-pressure behavior; improved resilience and reduced cascading failures by 40\%; k6, fault injection.}
+\resumeItemListEnd
+
+\resumeProjectHeading{GlideCast: Low Latency Remote Session Client for Windows }{Sept. 2023}
+\resumeItemListStart
+  \resumeItem{Built a native Windows client with asynchronous pipelines and bounded queues to handle input events and frame updates; achieved 60 FPS streaming with median input-to-frame latency under 35 ms in local tests; C\#, .NET 8.}
+  \resumeItem{Implemented reconnect with exponential backoff, session resume, and congestion control; improved reconnect success rate to 98\% and reduced disconnect recovery time by 55\%; gRPC, WebSockets.}
+  \resumeItem{Instrumented client and service telemetry with distributed tracing and performance counters; reduced time-to-root-cause by 50\% using dashboards and structured error taxonomy; OpenTelemetry, monitoring.}
+\resumeItemListEnd
+
+\vspace{2pt}
+\resumeItem{\textbf{Hackathons}}
+\vspace{-2pt}
+
+\resumeProjectHeading{TriageFlow: Real Time Incident Queue Optimizer }{Jan. 2024}
+\resumeItemListStart
+  \resumeItem{Built a real-time incident triage system that prioritizes events using a rules engine plus scoring model; reduced alert backlog by 55\% in simulated workloads; Kafka, Node.js, Redis.}
+  \resumeItem{Implemented deduplication, idempotent processing, and dead-letter replay tooling to handle bursts without dropping messages; improved processing stability under 10x traffic spikes; Kafka, Redis.}
+  \resumeItem{Shipped dashboards for event latency and error rate with burn-rate alerts; cut time-to-detect by 40\%; OpenTelemetry, dashboards.}
+\resumeItemListEnd
+
+\resumeProjectHeading{MatchMint: Serverless Scheduling and Constraint Matching Engine  }{Oct. 2023}
+\resumeItemListStart
+  \resumeItem{Built a scheduling platform that matches participants using availability windows and constraints; reduced scheduling conflicts by 60\% in simulation; AWS Lambda, DynamoDB.}
+  \resumeItem{Implemented event-driven notifications and reminders; achieved sub-second confirmation for common cases; SNS, serverless orchestration.}
+  \resumeItem{Added RBAC and audit logs for administrative actions; improved traceability and security posture; JWT, RBAC.}
+\resumeItemListEnd
+
+\resumeProjectHeading{VaultLink: Zero Trust File Share with Expiring Access }{Mar. 2023}
+\resumeItemListStart
+  \resumeItem{Built secure file sharing with short-lived signed links, download limits, and audit trails; reduced unauthorized access attempts by 75\% in testing; AWS S3, signed URLs.}
+  \resumeItem{Implemented rate limiting and anomaly alerts; sustained 5{,}000 requests per second under load tests; Redis, dashboards.}
+  \resumeItem{Shipped a simple UI for sharing and access control; improved demo completion by 20\%; React, Node.js.}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+
+\section{Certifications}
+\resumeSubHeadingListStart
+\resumeItem{\textbf{AWS Certified Solutions Architect Associate} \hfill 2025}
+\resumeItem{\textbf{HashiCorp Certified Terraform Associate} \hfill 2024}
+\resumeSubHeadingListEnd
+
+
+%-----------EDUCATION-----------
+\section{Education}
+\resumeSubHeadingListStart
+  \resumeSubheading
+    {Northeastern University}{Sep. 2022 -- May 2024}
+    {Master of Science in Computer Science}{Boston, Massachusetts}
+\resumeSubHeadingListEnd
+
+
+
+\end{document}

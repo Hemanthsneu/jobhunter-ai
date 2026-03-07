@@ -346,64 +346,97 @@
     });
 
 
-// Generate cover letter
-document.getElementById('btn-gen-cover').addEventListener('click', async () => {
-    if (!currentJob || !settings.anthropicKey) return;
+    // Download tailored resume as .tex (LaTeX) file for Overleaf
+    document.getElementById('btn-download-tex')?.addEventListener('click', async () => {
+        if (!currentJob || !settings.anthropicKey) return;
+        const btn = document.getElementById('btn-download-tex');
+        btn.textContent = 'Generating LaTeX...';
+        btn.disabled = true;
+        try {
+            const savedResume = await StorageManager.getResume('primary');
+            const resumeText = savedResume?.text || '';
+            if (!resumeText) { btn.textContent = 'No resume!'; return; }
 
-    const btn = document.getElementById('btn-gen-cover');
-    const content = document.getElementById('cover-content');
-    btn.textContent = '⏳...';
-    content.style.display = 'block';
-    content.innerHTML = '<div class="loading-shimmer" style="width:100%; height:80px;"></div>';
+            const latexBody = await ClaudeAI.tailorResumeLatex(
+                settings.anthropicKey,
+                resumeText,
+                currentJob.description || currentJob.title,
+                {
+                    name: settings.profileName || 'Hemanth Saragadam',
+                    role: settings.profileRole || 'Software Engineer',
+                    yoe: settings.profileYOE || ''
+                }
+            );
 
-    try {
-        const savedResume = await StorageManager.getResume('primary');
-        const letter = await ClaudeAI.generateCoverLetter(
-            settings.anthropicKey,
-            savedResume?.text || '',
-            currentJob.description || currentJob.title,
-            currentJob.company || ''
-        );
-        content.textContent = letter;
-    } catch (e) {
-        content.textContent = 'Error: ' + e.message;
-    }
+            const fullTeX = LaTeXTemplates.generateTeX(latexBody, 'hemanth');
+            const jobTitle = (currentJob?.title || 'Tailored_Resume').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_');
+            LaTeXTemplates.downloadTeX(fullTeX, `${jobTitle}.tex`);
+            btn.textContent = 'Downloaded!';
+        } catch (err) {
+            console.error('LaTeX generation failed:', err);
+            btn.textContent = 'Error';
+        }
+        setTimeout(() => { btn.textContent = 'Download .tex'; btn.disabled = false; }, 2500);
+    });
 
-    btn.textContent = 'Generate';
-});
+    // Generate cover letter
+    document.getElementById('btn-gen-cover').addEventListener('click', async () => {
+        if (!currentJob || !settings.anthropicKey) return;
 
-// Generate Interview Prep
-document.getElementById('btn-gen-interview').addEventListener('click', async () => {
-    if (!currentJob || !settings.anthropicKey) return;
+        const btn = document.getElementById('btn-gen-cover');
+        const content = document.getElementById('cover-content');
+        btn.textContent = '⏳...';
+        content.style.display = 'block';
+        content.innerHTML = '<div class="loading-shimmer" style="width:100%; height:80px;"></div>';
 
-    const btn = document.getElementById('btn-gen-interview');
-    const content = document.getElementById('interview-content');
-    btn.textContent = 'Generating...';
-    content.style.display = 'block';
-    content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:200px;"></div>';
+        try {
+            const savedResume = await StorageManager.getResume('primary');
+            const letter = await ClaudeAI.generateCoverLetter(
+                settings.anthropicKey,
+                savedResume?.text || '',
+                currentJob.description || currentJob.title,
+                currentJob.company || ''
+            );
+            content.textContent = letter;
+        } catch (e) {
+            content.textContent = 'Error: ' + e.message;
+        }
 
-    try {
-        const savedResume = await StorageManager.getResume('primary');
-        const questions = await ClaudeAI.generateInterviewPrep(
-            settings.anthropicKey,
-            currentJob.description || currentJob.title,
-            savedResume?.text || '',
-            currentJob.title || ''
-        );
+        btn.textContent = 'Generate';
+    });
 
-        if (Array.isArray(questions)) {
-            const categories = {};
-            questions.forEach(q => {
-                if (!categories[q.category]) categories[q.category] = [];
-                categories[q.category].push(q);
-            });
+    // Generate Interview Prep
+    document.getElementById('btn-gen-interview').addEventListener('click', async () => {
+        if (!currentJob || !settings.anthropicKey) return;
 
-            let html = '';
-            for (const [cat, qs] of Object.entries(categories)) {
-                html += `<div class="interview-category">
+        const btn = document.getElementById('btn-gen-interview');
+        const content = document.getElementById('interview-content');
+        btn.textContent = 'Generating...';
+        content.style.display = 'block';
+        content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:200px;"></div>';
+
+        try {
+            const savedResume = await StorageManager.getResume('primary');
+            const questions = await ClaudeAI.generateInterviewPrep(
+                settings.anthropicKey,
+                currentJob.description || currentJob.title,
+                savedResume?.text || '',
+                currentJob.title || ''
+            );
+
+            if (Array.isArray(questions)) {
+                const categories = {};
+                questions.forEach(q => {
+                    if (!categories[q.category]) categories[q.category] = [];
+                    categories[q.category].push(q);
+                });
+
+                let html = '';
+                for (const [cat, qs] of Object.entries(categories)) {
+                    html += `<div class="interview-category">
                         <h4 style="margin:12px 0 8px;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">${cat}</h4>`;
-                qs.forEach((q, i) => {
-                    html += `<details class="interview-card" style="margin-bottom:8px;background:var(--bg-elevated);border-radius:8px;padding:0;">
+                    qs.forEach((q, i) => {
+                        html += `<details class="interview-card" style="margin-bottom:8px;background:var(--bg-elevated);border-radius:8px;padding:0;">
                             <summary style="padding:10px 12px;cursor:pointer;font-size:12px;font-weight:500;list-style:none;display:flex;align-items:center;gap:8px;">
                                 <span style="background:${q.difficulty === 'Hard' ? 'var(--error)' : q.difficulty === 'Medium' ? 'var(--warning)' : 'var(--success)'};color:white;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;">${q.difficulty}</span>
                                 ${q.question}
@@ -414,71 +447,71 @@ document.getElementById('btn-gen-interview').addEventListener('click', async () 
                                 <p><strong style="color:var(--error);">Red flags:</strong> ${q.redFlags}</p>
                             </div>
                         </details>`;
-                });
-                html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                content.innerHTML = html;
+            } else {
+                content.textContent = 'Could not generate questions. Please try again.';
             }
-            content.innerHTML = html;
-        } else {
-            content.textContent = 'Could not generate questions. Please try again.';
+        } catch (e) {
+            content.textContent = 'Error: ' + e.message;
         }
-    } catch (e) {
-        content.textContent = 'Error: ' + e.message;
-    }
-    btn.textContent = 'Generate Questions';
-});
+        btn.textContent = 'Generate Questions';
+    });
 
-// Follow-Up Emails
-const followUpHandler = async (stage) => {
-    if (!currentJob || !settings.anthropicKey) return;
+    // Follow-Up Emails
+    const followUpHandler = async (stage) => {
+        if (!currentJob || !settings.anthropicKey) return;
 
-    const content = document.getElementById('followup-content');
-    content.style.display = 'block';
-    content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:80px;"></div>';
+        const content = document.getElementById('followup-content');
+        content.style.display = 'block';
+        content.innerHTML = '<div class="loading-shimmer" style="width:100%;height:80px;"></div>';
 
-    try {
-        const email = await ClaudeAI.generateFollowUp(
-            settings.anthropicKey,
-            { company: currentJob.company, title: currentJob.title, resumeSummary: '' },
-            stage
-        );
-        content.innerHTML = `
+        try {
+            const email = await ClaudeAI.generateFollowUp(
+                settings.anthropicKey,
+                { company: currentJob.company, title: currentJob.title, resumeSummary: '' },
+                stage
+            );
+            content.innerHTML = `
                 <div style="white-space:pre-wrap;font-size:12px;line-height:1.6;padding:12px;background:var(--bg-elevated);border-radius:8px;">${email}</div>
                 <button class="panel-btn" id="btn-copy-email" style="margin-top:8px;">Copy to Clipboard</button>
             `;
-        document.getElementById('btn-copy-email').addEventListener('click', () => {
-            navigator.clipboard.writeText(email);
-            document.getElementById('btn-copy-email').textContent = 'Copied!';
-            setTimeout(() => document.getElementById('btn-copy-email').textContent = 'Copy to Clipboard', 2000);
-        });
-    } catch (e) {
-        content.textContent = 'Error: ' + e.message;
-    }
-};
-document.getElementById('btn-followup-applied').addEventListener('click', () => followUpHandler('applied'));
-document.getElementById('btn-followup-interview').addEventListener('click', () => followUpHandler('interview'));
+            document.getElementById('btn-copy-email').addEventListener('click', () => {
+                navigator.clipboard.writeText(email);
+                document.getElementById('btn-copy-email').textContent = 'Copied!';
+                setTimeout(() => document.getElementById('btn-copy-email').textContent = 'Copy to Clipboard', 2000);
+            });
+        } catch (e) {
+            content.textContent = 'Error: ' + e.message;
+        }
+    };
+    document.getElementById('btn-followup-applied').addEventListener('click', () => followUpHandler('applied'));
+    document.getElementById('btn-followup-interview').addEventListener('click', () => followUpHandler('interview'));
 
-// Save job
-document.getElementById('btn-save-job').addEventListener('click', async () => {
-    if (currentJob) {
-        await StorageManager.saveApplication({
-            ...currentJob,
-            status: 'saved',
-            savedAt: new Date().toISOString()
-        });
-        document.getElementById('btn-save-job').textContent = '✅ Saved!';
-    }
-});
+    // Save job
+    document.getElementById('btn-save-job').addEventListener('click', async () => {
+        if (currentJob) {
+            await StorageManager.saveApplication({
+                ...currentJob,
+                status: 'saved',
+                savedAt: new Date().toISOString()
+            });
+            document.getElementById('btn-save-job').textContent = '✅ Saved!';
+        }
+    });
 
-// Mark applied
-document.getElementById('btn-mark-applied').addEventListener('click', async () => {
-    if (currentJob) {
-        await StorageManager.saveApplication({
-            ...currentJob,
-            status: 'applied',
-            appliedAt: new Date().toISOString()
-        });
-        document.getElementById('btn-mark-applied').textContent = '✅ Applied!';
-    }
-});
+    // Mark applied
+    document.getElementById('btn-mark-applied').addEventListener('click', async () => {
+        if (currentJob) {
+            await StorageManager.saveApplication({
+                ...currentJob,
+                status: 'applied',
+                appliedAt: new Date().toISOString()
+            });
+            document.getElementById('btn-mark-applied').textContent = '✅ Applied!';
+        }
+    });
 
-}) ();
+})();
